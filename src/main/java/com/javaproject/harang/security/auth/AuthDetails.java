@@ -3,17 +3,19 @@ package com.javaproject.harang.security.auth;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.security.AuthorityType;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Getter
 @AllArgsConstructor
 public class AuthDetails implements UserDetails {
 
-    private User user;
-    private AuthorityType authorityType;
+    private final User user;
+    private final AuthorityType authorityType;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

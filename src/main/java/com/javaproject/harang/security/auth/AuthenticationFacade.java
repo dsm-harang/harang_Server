@@ -20,4 +20,13 @@ public class AuthenticationFacade {
         return ((AuthDetails) this.getAuthentication().getPrincipal()).getAuthorityType();
     }
 
+    public Integer getReceiptCode(){
+        Authentication auth = this.getAuthentication();
+        if(auth.getPrincipal() instanceof  AuthDetails){
+            return ((AuthDetails) auth.getPrincipal()).getUser().getId();
+        }else {
+            return Integer.parseInt(this.getAuthentication().getName());
+        }
+    }
+
 }
