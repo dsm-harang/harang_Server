@@ -3,6 +3,7 @@ package com.javaproject.harang.entity.user.customer;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.security.AuthorityType;
 import lombok.*;
+import org.hibernate.usertype.UserType;
 
 import javax.persistence.*;
 

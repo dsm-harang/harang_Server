@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
 @Entity
 @AllArgsConstructor
@@ -27,14 +28,30 @@ public class Post {
 
     private String content;
 
+    private String writer;
+
+    private LocalDateTime meetTime;
+
     private String tag;
 
-    private String imagePath;
+    private String image;
 
-    private String adress;
+    private String address;
 
     private Integer ageLimit;
 
     private Integer personnel;
+
+    public Post updateFileName(String fileName) {
+        this.image = fileName;
+
+        return this;
+    }
+
+    public Post updateMeetTime(LocalDateTime meetTime) {
+        this.meetTime = meetTime;
+
+        return this;
+    }
 
 }

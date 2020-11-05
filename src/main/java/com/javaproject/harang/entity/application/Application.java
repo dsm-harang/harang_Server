@@ -1,5 +1,6 @@
 package com.javaproject.harang.entity.application;
 
+import com.javaproject.harang.entity.application.eunm.Status;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -23,6 +24,15 @@ public class Application {
 
     private Integer userId;
 
+    private Integer targetId;
+
     private LocalDateTime appliedAt;
 
+    private Status status;
+
+    public Application accept() {
+        this.status = Status.COMPLETION;
+
+        return this;
+    }
 }
