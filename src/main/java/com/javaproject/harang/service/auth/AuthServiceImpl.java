@@ -5,6 +5,8 @@ import com.javaproject.harang.entity.refresh_token.RefreshTokenRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.admin.AdminRepository;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.ExpiredTokenException;
+import com.javaproject.harang.exception.UserNotFoundException;
 import com.javaproject.harang.payload.request.AccountRequest;
 import com.javaproject.harang.payload.response.TokenResponse;
 import com.javaproject.harang.security.AuthorityType;
@@ -45,7 +47,7 @@ public class AuthServiceImpl implements AuthService{
                     String accessToken = tokenProvider.generateAccessToken(refreshToken.getId(), AuthorityType.USER);
                     return new TokenResponse(accessToken, refreshToken.getRefreshToken(), tokenType);
                 })
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFoundException::new);
 
     }
 
@@ -81,7 +83,7 @@ public class AuthServiceImpl implements AuthService{
                     String generatedAccessToken = tokenProvider.generateAccessToken(refreshToken.getId(), AuthorityType.USER);
                     return new TokenResponse(generatedAccessToken, refreshToken.getRefreshToken(), tokenType);
                 })
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(ExpiredTokenException::new);
     }
 
     @Override
@@ -99,7 +101,7 @@ public class AuthServiceImpl implements AuthService{
                     String generatedAccessToken = tokenProvider.generateAccessToken(refreshToken.getId(), AuthorityType.ADMIN);
                     return new TokenResponse(generatedAccessToken, refreshToken.getRefreshToken(), tokenType);
                 })
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(ExpiredTokenException::new);
     }
 
 }
