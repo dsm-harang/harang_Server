@@ -68,7 +68,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public void PostDelete(@PathVariable Integer postId){
+    public void postDelete(@PathVariable Integer postId){
         postService.postDelete(postId);
     }
 
@@ -92,4 +92,14 @@ public class PostController {
         postService.sendPost(postId);
     }
 
+    @PostMapping("/report/{postId}")
+    private void report(@PathVariable Integer postId,
+                        @RequestParam String content){
+        postService.report(postId, content);
+    }
+
+    @GetMapping("/tag")
+    public List<PostListResponse> searchTag(@RequestParam String tag) {
+        return postService.searchTag(tag);
+    }
 }

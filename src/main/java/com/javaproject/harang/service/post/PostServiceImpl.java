@@ -7,6 +7,8 @@ import com.javaproject.harang.entity.application.ApplicationRepository;
 import com.javaproject.harang.entity.application.eunm.Status;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
+import com.javaproject.harang.entity.report.Report;
+import com.javaproject.harang.entity.report.repository.ReportRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.payload.request.PostUpdateRequest;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.File;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +32,7 @@ import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
-public class PostServiceImpl implements PostService{
+public class PostServiceImpl implements PostService {
 
     @Value("${image.file.path}")
     private String imagePath;
@@ -38,6 +41,7 @@ public class PostServiceImpl implements PostService{
     private final PostRepository postRepository;
     private final ApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
+    private final ReportRepository reportRepository;
 
     private final AuthenticationFacade authenticationFacade;
 
@@ -52,33 +56,34 @@ public class PostServiceImpl implements PostService{
 
         Post post = postRepository.save(
                 Post.builder()
-                .userId(user.getId())
-                .title(postWriteRequest.getTitle())
-                .content(postWriteRequest.getContent())
-                .createdAt(LocalDateTime.now())
-                .tag(postWriteRequest.getTag())
-                .meetTime(postWriteRequest.getMeetTime())
-                .address(postWriteRequest.getAddress())
-                .ageLimit(postWriteRequest.getAgeLimit())
-                .personnel(postWriteRequest.getPersonnel())
-                .image(postWriteRequest.getImage()+fileName)
-                .writer(user.getName())
-                .build()
+                        .userId(user.getId())
+                        .title(postWriteRequest.getTitle())
+                        .content(postWriteRequest.getContent())
+                        .createdAt(LocalDateTime.now())
+                        .tag(postWriteRequest.getTag())
+                        .meetTime(postWriteRequest.getMeetTime())
+                        .address(postWriteRequest.getAddress())
+                        .ageLimit(postWriteRequest.getAgeLimit())
+                        .personnel(postWriteRequest.getPersonnel())
+                        .image(postWriteRequest.getImage() + fileName)
+                        .writer(user.getName())
+                        .build()
         );
 
         memberRepository.findByUserIdAndPostId(user.getId(), post.getId())
-                .ifPresent(member -> {throw new RuntimeException();});
+                .ifPresent(member -> {
+                    throw new RuntimeException();
+                });
 
         memberRepository.save(
                 Member.builder()
-                    .postId(post.getId())
-                    .userId(user.getId())
-                    .build()
+                        .postId(post.getId())
+                        .userId(user.getId())
+                        .build()
         );
 
         File file = new File(imagePath, fileName);
         postWriteRequest.getImage().transferTo(file);
-
     }
 
     @SneakyThrows
@@ -115,7 +120,6 @@ public class PostServiceImpl implements PostService{
         setIfNotNull(post::setAgeLimit, postUpdateRequest.getAgeLimit());
         setIfNotNull(post::setPersonnel, postUpdateRequest.getPersonnel());
 
-
         postRepository.save(post);
     }
 
@@ -141,7 +145,6 @@ public class PostServiceImpl implements PostService{
         if (file.exists()) file.delete();
 
         postRepository.deleteById(post.getId());
-
         postRepository.delete(post);
         postRepository.delete(postImage);
     }
@@ -217,11 +220,10 @@ public class PostServiceImpl implements PostService{
 
         memberRepository.save(
                 Member.builder()
-                    .postId(posts.getId())
-                    .userId(application.getUserId())
-                    .build()
+                        .postId(posts.getId())
+                        .userId(application.getUserId())
+                        .build()
         );
-
     }
 
     @Override
@@ -239,10 +241,14 @@ public class PostServiceImpl implements PostService{
         if (memberCount >= post.getPersonnel()) throw new RuntimeException();
 
         applicationRepository.findByUserIdAndPostIdAndAndStatus(user.getId(), postId, Status.READY)
-                .ifPresent(application -> {throw new RuntimeException();});
+                .ifPresent(application -> {
+                    throw new RuntimeException();
+                });
 
         memberRepository.findByUserIdAndPostId(user.getId(), postId)
-                .ifPresent(member -> {throw new RuntimeException();});
+                .ifPresent(member -> {
+                    throw new RuntimeException();
+                });
 
         applicationRepository.save(
                 Application.builder()
@@ -253,13 +259,53 @@ public class PostServiceImpl implements PostService{
                         .appliedAt(LocalDateTime.now())
                         .build()
         );
-
     }
 
-    private <T> void setIfNotNull(Consumer<T> setter, T value){
-        if(value != null){
+    @Override
+    public void report(Integer postId, String content) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        User user = customerRepository.findById(receiptCode)
+                .orElseThrow(RuntimeException::new);
+
+        reportRepository.findByUserIdAndPostId(user.getId(), postId)
+                .ifPresent(report -> {throw new RuntimeException();});
+
+        reportRepository.save(
+                Report.builder()
+                        .userId(user.getId())
+                        .postId(postId)
+                        .reportTime(LocalDate.now())
+                        .build()
+        );
+    }
+
+    @Override
+    public List<PostListResponse> searchTag(String tag) {
+        List<Post> posts = postRepository.findByTagContainsOrTitleContains(tag, tag);
+
+        List<PostListResponse> list = new ArrayList<>();
+        for (Post post : posts) {
+            File fileName = new File(post.getImage());
+            list.add(
+                    PostListResponse.builder()
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .writer(post.getWriter())
+                        .meetTime(post.getMeetTime())
+                        .address(post.getAddress())
+                        .ageLimit(post.getAgeLimit())
+                        .createdAt(post.getCreatedAt())
+                        .personnel(post.getPersonnel())
+                        .imageName(fileName.getName())
+                        .build()
+            );
+        }
+        return list;
+    }
+
+    private <T> void setIfNotNull(Consumer<T> setter, T value) {
+        if (value != null) {
             setter.accept(value);
         }
     }
-
 }
