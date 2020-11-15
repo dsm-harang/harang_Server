@@ -13,15 +13,23 @@ import java.time.LocalDate;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Report {
+public class UserReports {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer postId;
+    private String content;
 
     private Integer userId;
+
+    private String targetName;
+
+    private String targetUserId;
+
+    private Integer targetId;
+
+    private Integer score;
 
     private LocalDate reportTime;
 }

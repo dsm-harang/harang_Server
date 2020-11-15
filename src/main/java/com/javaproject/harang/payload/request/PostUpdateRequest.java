@@ -17,6 +17,7 @@ public class PostUpdateRequest {
     private Integer ageLimit;
     private Integer personnel;
     private MultipartFile image;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime meetTime;
 }

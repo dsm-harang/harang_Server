@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class MainPageResponse {
+public class GetPostResponse {
     private String title;
     private String content;
     private String writer;

@@ -1,7 +1,6 @@
 package com.javaproject.harang.entity.member;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.expression.spel.ast.OpAnd;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

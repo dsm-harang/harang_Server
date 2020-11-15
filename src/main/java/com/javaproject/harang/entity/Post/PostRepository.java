@@ -1,12 +1,11 @@
 package com.javaproject.harang.entity.Post;
 
-import com.javaproject.harang.entity.user.customer.Customer;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface PostRepository extends CrudRepository<Post, Integer> {
-    Optional<Post> deleteByUserId(Integer userId);
+    List<Post> findByTagContainsOrTitleContains(String tag, String title);
 }

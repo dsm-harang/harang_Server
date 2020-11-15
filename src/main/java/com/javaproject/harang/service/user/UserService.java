@@ -4,4 +4,5 @@ import com.javaproject.harang.payload.request.SignUpRequest;
 
 public interface UserService {
     void signUp(SignUpRequest signUpRequest);
+    void userReport(Integer targetId, String content);
 }

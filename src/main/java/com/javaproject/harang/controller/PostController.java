@@ -2,7 +2,7 @@ package com.javaproject.harang.controller;
 
 import com.javaproject.harang.payload.request.PostUpdateRequest;
 import com.javaproject.harang.payload.request.PostWriteRequest;
-import com.javaproject.harang.payload.response.MainPageResponse;
+import com.javaproject.harang.payload.response.GetPostResponse;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.service.post.PostService;
 import lombok.RequiredArgsConstructor;
@@ -69,13 +69,13 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public void PostDelete(@PathVariable Integer postId){
+    public void postDelete(@PathVariable Integer postId){
         postService.postDelete(postId);
     }
 
     @GetMapping("/{postId}")
-    public MainPageResponse mainPage(@PathVariable Integer postId){
-        return postService.mainPage(postId);
+    public GetPostResponse getPost(@PathVariable Integer postId){
+        return postService.getPost(postId);
     }
 
     @GetMapping
@@ -83,14 +83,24 @@ public class PostController {
         return postService.getPostList();
     }
 
-    @GetMapping("/{applicationId}")
+    @GetMapping("/accept/{applicationId}")
     public void accept(@PathVariable Integer applicationId){
         postService.accept(applicationId);
     }
 
     @PostMapping("/{postId}")
-    private void sendTest(@PathVariable Integer postId){
-        postService.sendTest(postId);
+    private void sendPost(@PathVariable Integer postId){
+        postService.sendPost(postId);
     }
 
+    @PostMapping("/report/{postId}")
+    private void report(@PathVariable Integer postId,
+                        @RequestParam String content){
+        postService.report(postId, content);
+    }
+
+    @GetMapping("/tag")
+    public List<PostListResponse> searchTag(@RequestParam String tag) {
+        return postService.searchTag(tag);
+    }
 }
