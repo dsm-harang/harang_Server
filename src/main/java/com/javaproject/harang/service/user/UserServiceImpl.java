@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService{
 
         String fileName = UUID.randomUUID().toString();
 
-        Customer customer = customerRepository.save(
+        customerRepository.save(
                 Customer.builder()
                         .userId(signUpRequest.getUserId())
                         .password(passwordEncoder.encode(signUpRequest.getPassword()))

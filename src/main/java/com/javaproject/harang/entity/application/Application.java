@@ -3,10 +3,7 @@ package com.javaproject.harang.entity.application;
 import com.javaproject.harang.entity.application.eunm.Status;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -28,6 +25,7 @@ public class Application {
 
     private LocalDateTime appliedAt;
 
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     public Application accept() {

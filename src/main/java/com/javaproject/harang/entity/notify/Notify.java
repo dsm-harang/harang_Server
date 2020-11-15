@@ -1,5 +1,6 @@
 package com.javaproject.harang.entity.notify;
 
+import com.javaproject.harang.entity.notify.NotifyType.NotifyType;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -21,10 +22,11 @@ public class Notify {
 
     private Integer userId;
 
-    private Integer targetId;
-
     private String content;
 
     private LocalDateTime createdAt;
 
+    private NotifyType Type;
+
 }
+

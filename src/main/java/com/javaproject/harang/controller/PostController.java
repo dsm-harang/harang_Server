@@ -2,7 +2,7 @@ package com.javaproject.harang.controller;
 
 import com.javaproject.harang.payload.request.PostUpdateRequest;
 import com.javaproject.harang.payload.request.PostWriteRequest;
-import com.javaproject.harang.payload.response.MainPageResponse;
+import com.javaproject.harang.payload.response.GetPostResponse;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.service.post.PostService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,6 @@ public class PostController {
     public void PostWrite(@RequestParam String title,
                           @RequestParam String content,
                           @RequestParam String tag,
-                          @RequestParam LocalDateTime meetTime,
                           @RequestParam Integer ageLimit,
                           @RequestParam String address,
                           @RequestParam Integer personnel,
@@ -34,7 +33,7 @@ public class PostController {
                     .title(title)
                     .content(content)
                     .tag(tag)
-                    .meetTime(meetTime)
+                    .meetTime(LocalDateTime.now())
                     .ageLimit(ageLimit)
                     .address(address)
                     .personnel(personnel)
@@ -74,8 +73,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public MainPageResponse mainPage(@PathVariable Integer postId){
-        return postService.mainPage(postId);
+    public GetPostResponse getPost(@PathVariable Integer postId){
+        return postService.getPost(postId);
     }
 
     @GetMapping
@@ -83,14 +82,14 @@ public class PostController {
         return postService.getPostList();
     }
 
-    @GetMapping("/{applicationId}")
+    @GetMapping("/accept/{applicationId}")
     public void accept(@PathVariable Integer applicationId){
         postService.accept(applicationId);
     }
 
     @PostMapping("/{postId}")
-    private void sendTest(@PathVariable Integer postId){
-        postService.sendTest(postId);
+    private void sendPost(@PathVariable Integer postId){
+        postService.sendPost(postId);
     }
 
 }
