@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class PostListResponse {
+    private Integer postId;
+    private Integer userId;
     private String title;
     private String content;
     private String writer;
@@ -17,4 +19,5 @@ public class PostListResponse {
     private LocalDateTime createdAt;
     private Integer personnel;
     private String imageName;
+    private Integer score;
 }
