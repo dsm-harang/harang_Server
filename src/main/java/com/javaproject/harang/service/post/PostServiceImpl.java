@@ -9,6 +9,8 @@ import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
 import com.javaproject.harang.entity.report.Report;
 import com.javaproject.harang.entity.report.repository.ReportRepository;
+import com.javaproject.harang.entity.score.Score;
+import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.payload.request.PostUpdateRequest;
@@ -42,6 +44,7 @@ public class PostServiceImpl implements PostService {
     private final ApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
+    private final ScoreRepository scoreRepository;
 
     private final AuthenticationFacade authenticationFacade;
 
@@ -185,9 +188,16 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = (List<Post>) postRepository.findAll();
 
         for (Post post : posts) {
+
+            Score score = scoreRepository.findByUserId(post.getUserId())
+                    .orElseThrow(RuntimeException::new);
+
             File fileName = new File(post.getImage());
             list.add(
                     PostListResponse.builder()
+                            .postId(post.getId())
+                            .score(score.getScore())
+                            .userId(post.getUserId())
                             .title(post.getTitle())
                             .content(post.getContent())
                             .writer(post.getWriter())
