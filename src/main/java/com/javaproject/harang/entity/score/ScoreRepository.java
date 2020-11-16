@@ -9,10 +9,11 @@ import java.util.Optional;
 
 @Repository
 public interface ScoreRepository extends CrudRepository<Score, Integer> {
-    //    Optional<Score> findByScore_target_name(String score_target_name);
 
     @Query("SELECT c FROM Score c WHERE c.userId=:userId")
     List<Score> findAllByUserId(Integer userId);
     Optional<Score> findByUserId(Integer userId);
+
+    Optional<Score> findByUserIdAndScoreTargetId(Integer userId, Integer scoreTargetId);
 }
 

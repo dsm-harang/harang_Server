@@ -1,5 +1,6 @@
 package com.javaproject.harang.entity.chat;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class ChatRoom {
     @Column(name = "room_id")
     private Integer id;
     private String status;
+    @JsonManagedReference
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<ChatMessage> messages = new ArrayList<>();
 }

@@ -1,7 +1,6 @@
 package com.javaproject.harang.service.mypage;
 
 import com.javaproject.harang.entity.member.Member;
-import com.javaproject.harang.entity.member.MyPostForm;
 import com.javaproject.harang.entity.member.MemberRepository;
 import com.javaproject.harang.entity.notify.Notify;
 import com.javaproject.harang.entity.notify.NotifyRepository;
@@ -11,10 +10,7 @@ import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
-import com.javaproject.harang.payload.response.ListScoreResponse;
-import com.javaproject.harang.payload.response.NotifyResponse;
-import com.javaproject.harang.payload.response.MySeePageResponse;
-import com.javaproject.harang.payload.response.ScoreResponse;
+import com.javaproject.harang.payload.response.*;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -35,7 +31,6 @@ public class MyPageServiceImpl implements MypageService {
     private final AuthenticationFacade authenticationFacade;
     private final ScoreRepository scoreRepository;
     private final MemberRepository memberRepository;
-    private final EntityManager entityManager;
     private final NotifyRepository notifyRepository;
     @Value("${image.file.path}")
     private String imagePath;
@@ -108,27 +103,47 @@ public class MyPageServiceImpl implements MypageService {
     }
 
     @Override
-    public Map<String, Object> SendScore(Integer postId, Integer score, String score_content, Integer score_target_id) {
+    public Map<String, Object> SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId) {
         Map<String, Object> map = new HashMap<>();
 
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(RuntimeException::new);
-        Member member = memberRepository.findByPostId(postId).orElseThrow();
-
-        if (user.getId().equals(member.getUserId())) {
-            scoreRepository.save(
-                    Score.builder()
-                            .score(score)
-                            .score_at(LocalDateTime.now())
-                            .score_comment(score_content)
-                            .score_target_id(score_target_id)
-                            .userId(user.getId())
-                            .build()
-            );
-            map.put("message", "success");
+        Member member = memberRepository.findByUserIdAndPostId(user.getId(), postId).orElseThrow();
+        try {
+            Score scores = scoreRepository.findByUserIdAndScoreTargetId(user.getId(), scoreTargetId).orElseThrow();
+            if (scores.getScoreTargetId().equals(scoreTargetId)) {
+                scores.setScore(score);
+                scores.setScoreAt(LocalDateTime.now());
+                scores.setScoreComment(scoreContent);
+                scoreRepository.save(scores);
+            } else {
+                if (user.getId().equals(member.getUserId())) {
+                    scoreRepository.save(
+                            Score.builder()
+                                    .score(score)
+                                    .scoreAt(LocalDateTime.now())
+                                    .scoreComment(scoreContent)
+                                    .scoreTargetId(scoreTargetId)
+                                    .userId(user.getId())
+                                    .build()
+                    );
+                }
+            }
+        } catch (NoSuchElementException e) {
+            if (user.getId().equals(member.getUserId())) {
+                scoreRepository.save(
+                        Score.builder()
+                                .score(score)
+                                .scoreAt(LocalDateTime.now())
+                                .scoreComment(scoreContent)
+                                .scoreTargetId(scoreTargetId)
+                                .userId(user.getId())
+                                .build()
+                );
+            }
         }
-
+        map.put("message", "success");
         return map;
     }
 
@@ -140,15 +155,13 @@ public class MyPageServiceImpl implements MypageService {
                 .orElseThrow(RuntimeException::new);
 
 //        Member member = memberRepository.findByUserId(user.getId()).orElseThrow();
-        List<MyPostForm> postForms =memberRepository.findALLByuserId(user.getId());
+        List<MyPostResponse> postForms = memberRepository.findALLByuserId(user.getId());
         List<Member> members = new ArrayList<>();
         postForms.stream()
                 .forEach(p -> {
                     members.addAll(memberRepository.findALLByPostId(p.getPostId()));
                 });
-//        List<Member> memberList = memberRepository.findByAllUserId(member);
 
-        // return members;
         return new ListScoreResponse(members);
     }
 
@@ -157,7 +170,7 @@ public class MyPageServiceImpl implements MypageService {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(RuntimeException::new);
-        List<MyPostForm> member =memberRepository.findALLByuserId(user.getId());
+        List<MyPostResponse> member = memberRepository.findALLByuserId(user.getId());
 
         System.out.println(member);
         return new MySeePageResponse(member);

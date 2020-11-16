@@ -1,7 +1,7 @@
 package com.javaproject.harang.service.chat;
 
 import com.javaproject.harang.entity.chat.ChatMessage;
-import com.javaproject.harang.entity.chat.ChatMessageForm;
+import com.javaproject.harang.payload.response.chatresponse.ChatMessageForm;
 import com.javaproject.harang.entity.chat.ChatMessageRepository;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import lombok.RequiredArgsConstructor;
