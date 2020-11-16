@@ -1,5 +1,6 @@
 package com.javaproject.harang.service.mypage;
 
+import com.javaproject.harang.entity.Post.PostRepository;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
 import com.javaproject.harang.entity.notify.Notify;
@@ -27,11 +28,12 @@ import java.util.*;
 public class MyPageServiceImpl implements MypageService {
 
     private final CustomerRepository customerRepository;
-
     private final AuthenticationFacade authenticationFacade;
     private final ScoreRepository scoreRepository;
     private final MemberRepository memberRepository;
     private final NotifyRepository notifyRepository;
+    private final PostRepository postRepository;
+
     @Value("${image.file.path}")
     private String imagePath;
 
@@ -96,8 +98,7 @@ public class MyPageServiceImpl implements MypageService {
     @Override
     public ScoreResponse GetScore(Integer Id) {
         Customer user = customerRepository.findById(Id).orElseThrow(RuntimeException::new);
-        List<Score> scores = scoreRepository.findAllByUserId(user.getId());
-
+        List<Score> scores = scoreRepository.findByScoreTargetId(user.getId());
 
         return new ScoreResponse(scores);
     }
@@ -144,6 +145,7 @@ public class MyPageServiceImpl implements MypageService {
             }
         }
         map.put("message", "success");
+
         return map;
     }
 
@@ -153,8 +155,6 @@ public class MyPageServiceImpl implements MypageService {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(RuntimeException::new);
-
-//        Member member = memberRepository.findByUserId(user.getId()).orElseThrow();
         List<MyPostResponse> postForms = memberRepository.findALLByuserId(user.getId());
         List<Member> members = new ArrayList<>();
         postForms.stream()
@@ -172,7 +172,6 @@ public class MyPageServiceImpl implements MypageService {
                 .orElseThrow(RuntimeException::new);
         List<MyPostResponse> member = memberRepository.findALLByuserId(user.getId());
 
-        System.out.println(member);
         return new MySeePageResponse(member);
     }
 
@@ -182,6 +181,7 @@ public class MyPageServiceImpl implements MypageService {
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(RuntimeException::new);
         List<Notify> notify = notifyRepository.findAllByUserId(user.getId());
+
         return new NotifyResponse(notify);
     }
 }

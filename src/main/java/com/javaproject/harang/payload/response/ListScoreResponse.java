@@ -11,6 +11,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class ListScoreResponse {
-    List<Member> ListScore  ;
+    List<Member> ListScore;
 
 }
