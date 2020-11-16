@@ -82,6 +82,7 @@ public class PostServiceImpl implements PostService {
                 Member.builder()
                         .postId(post.getId())
                         .userId(user.getId())
+                        .userName(user.getName())
                         .build()
         );
 
@@ -225,6 +226,7 @@ public class PostServiceImpl implements PostService {
         Post posts = postRepository.findById(application.getPostId())
                 .filter(post -> user.getId().equals(post.getUserId()))
                 .orElseThrow(RuntimeException::new);
+        User username = customerRepository.findById(application.getUserId()).orElseThrow();
 
         application.accept();
 
@@ -232,6 +234,7 @@ public class PostServiceImpl implements PostService {
                 Member.builder()
                         .postId(posts.getId())
                         .userId(application.getUserId())
+                        .userName(username.getName())
                         .build()
         );
     }

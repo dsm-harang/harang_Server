@@ -18,10 +18,10 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -150,19 +150,15 @@ public class MyPageServiceImpl implements MypageService {
     }
 
     @Override
-    public ListScoreResponse ListScore() {
-        List<com.javaproject.harang.controller.ScoreListResponse> list = new ArrayList<>();
+    public ListScoreResponse ListScore(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(RuntimeException::new);
-        List<MyPostResponse> postForms = memberRepository.findALLByuserId(user.getId());
-        List<Member> members = new ArrayList<>();
-        postForms.stream()
-                .forEach(p -> {
-                    members.addAll(memberRepository.findALLByPostId(p.getPostId()));
-                });
-
-        return new ListScoreResponse(members);
+        List<Member> members = memberRepository.findALLByPostId(postId);
+        List<Member> collect = members.stream()
+                .filter(m -> !m.getUserId().equals(user.getId()))
+                .collect(Collectors.toList());
+        return new ListScoreResponse(collect);
     }
 
     @Override

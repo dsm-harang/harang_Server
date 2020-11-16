@@ -20,7 +20,7 @@ public interface MypageService {
 
     Map<String, Object> SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId);
 
-    ListScoreResponse ListScore();
+    ListScoreResponse ListScore(Integer postId);
 
     MySeePageResponse MyPost();
 
