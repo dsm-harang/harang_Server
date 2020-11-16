@@ -6,6 +6,8 @@ import com.javaproject.harang.entity.report.Report;
 import com.javaproject.harang.entity.report.UserReports;
 import com.javaproject.harang.entity.report.repository.ReportRepository;
 import com.javaproject.harang.entity.report.repository.UserReportRepository;
+import com.javaproject.harang.entity.score.Score;
+import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.admin.Admin;
 import com.javaproject.harang.entity.user.admin.AdminRepository;
@@ -13,6 +15,7 @@ import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.payload.response.PostReportResponse;
+import com.javaproject.harang.payload.response.UserPageResponse;
 import com.javaproject.harang.payload.response.UserReportResponse;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,7 @@ public class AdminServiceImpl implements AdminService{
     private final ReportRepository reportRepository;
     private final PostRepository postRepository;
     private final CustomerRepository customerRepository;
+    private final ScoreRepository scoreRepository;
 
 
     private final AuthenticationFacade authenticationFacade;
@@ -110,6 +114,12 @@ public class AdminServiceImpl implements AdminService{
         Integer receiptCode = authenticationFacade.getReceiptCode();
         Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(RuntimeException::new);
+
+        Score score = scoreRepository.findById(userId)
+                .orElseThrow(RuntimeException::new);
+
+        scoreRepository.deleteById(score.getId());
+        scoreRepository.delete(score);
     }
 
     @Override
@@ -158,5 +168,34 @@ public class AdminServiceImpl implements AdminService{
             );
         }
         return list;
+    }
+
+    @Override
+    public UserPageResponse userPage(Integer userId) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        adminRepository.findById(receiptCode)
+                .orElseThrow(RuntimeException::new);
+
+        Customer customer = customerRepository.findById(userId)
+                .orElseThrow(RuntimeException::new);
+
+        Score score = scoreRepository.findById(userId)
+                .orElseThrow(RuntimeException::new);
+
+        List<UserReports> reportList = userReportRepository.findByTargetUserId(userId);
+
+        List<String> contents = new ArrayList<>();
+        for(UserReports report :  reportList){
+            contents.add(report.getContent());
+        }
+
+        File fileName = new File(customer.getImagePath());
+
+        return UserPageResponse.builder()
+                    .score(score.getScore())
+                    .name(customer.getName())
+                    .imageName(fileName.getName())
+                    .content(contents)
+                    .build();
     }
 }
