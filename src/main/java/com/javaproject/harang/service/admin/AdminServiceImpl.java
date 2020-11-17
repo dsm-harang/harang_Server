@@ -13,6 +13,10 @@ import com.javaproject.harang.entity.user.admin.Admin;
 import com.javaproject.harang.entity.user.admin.AdminRepository;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.AdminNotFound;
+import com.javaproject.harang.exception.PostNotFound;
+import com.javaproject.harang.exception.TargetNotFound;
+import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.payload.response.PostReportResponse;
 import com.javaproject.harang.payload.response.UserPageResponse;
@@ -39,40 +43,42 @@ public class AdminServiceImpl implements AdminService{
     private final CustomerRepository customerRepository;
     private final ScoreRepository scoreRepository;
 
-
     private final AuthenticationFacade authenticationFacade;
 
 
     @Override
-    public void userDelete(Integer userId) {
+    public void userDelete(Integer targetId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        Admin admin = adminRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+        adminRepository.findById(receiptCode)
+                .orElseThrow(AdminNotFound::new);
 
-        Customer user = customerRepository.findById(userId)
-                .orElseThrow(RuntimeException::new);
+        Customer user = customerRepository.findById(targetId)
+                .orElseThrow(UserNotFound::new);
 
-        UserReports userReports = userReportRepository.findById(userId)
-                .orElseThrow(RuntimeException::new);
+        List<UserReports> userReports = userReportRepository.findByTargetUserId(targetId);
+        if (userReports.size() < 0) throw new TargetNotFound();
+
+        for (UserReports userReports1 : userReports) {
+            userReportRepository.deleteById(userReports1.getId());
+            userReportRepository.delete(userReports1);
+        }
 
         customerRepository.deleteById(user.getId());
         customerRepository.delete(user);
 
-        userReportRepository.deleteById(userReports.getId());
-        userReportRepository.delete(userReports);
     }
 
     @Override
     public void userPostDelete(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        Admin admin = adminRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+        adminRepository.findById(receiptCode)
+                .orElseThrow(AdminNotFound::new);
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(PostNotFound::new);
 
         Report report = reportRepository.findById(postId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(PostNotFound::new);
 
         postRepository.deleteById(post.getId());
         postRepository.delete(post);
@@ -83,27 +89,28 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
-    public void userReportDelete(Integer userId) {
+    public void userReportDelete(Integer targetId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        Admin admin = adminRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+        adminRepository.findById(receiptCode)
+                .orElseThrow(AdminNotFound::new);
 
-        UserReports userReports = userReportRepository.findById(userId)
-                .orElseThrow(RuntimeException::new);
+        List<UserReports> userReports = userReportRepository.findByTargetUserId(targetId);
+        if (userReports.size() < 0) throw new TargetNotFound();
 
-        userReportRepository.deleteById(userReports.getId());
-        userReportRepository.delete(userReports);
-
+        for (UserReports userReports1 : userReports) {
+            userReportRepository.deleteById(userReports1.getId());
+            userReportRepository.delete(userReports1);
+        }
     }
 
     @Override
     public void postReportDelete(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        Admin admin = adminRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+        adminRepository.findById(receiptCode)
+                .orElseThrow(AdminNotFound::new);
 
         Report report = reportRepository.findById(postId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(PostNotFound::new);
 
         reportRepository.deleteById(report.getId());
         reportRepository.delete(report);
@@ -112,11 +119,11 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public void score(Integer userId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        Admin admin = adminRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+        adminRepository.findById(receiptCode)
+                .orElseThrow(AdminNotFound::new);
 
         Score score = scoreRepository.findById(userId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         scoreRepository.deleteById(score.getId());
         scoreRepository.delete(score);
@@ -126,12 +133,12 @@ public class AdminServiceImpl implements AdminService{
     public List<PostReportResponse> postReport() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         adminRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(AdminNotFound::new);
 
         List<PostReportResponse> list = new ArrayList<>();
         for (Report report : reportRepository.findAll()) {
             Post post = postRepository.findById(report.getId())
-                    .orElseThrow(RuntimeException::new);
+                    .orElseThrow(UserNotFound::new);
 
             list.add(
                 PostReportResponse.builder()
@@ -150,13 +157,13 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public List<UserReportResponse> userReport() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        Admin admin = adminRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+        adminRepository.findById(receiptCode)
+                .orElseThrow(AdminNotFound::new);
 
         List<UserReportResponse> list = new ArrayList<>();
         for(UserReports reports : userReportRepository.findAll()){
-            Customer customer = customerRepository.findById(reports.getId())
-                    .orElseThrow(RuntimeException::new);
+            customerRepository.findById(reports.getTargetId())
+                    .orElseThrow(TargetNotFound::new);
 
             list.add(
                     UserReportResponse.builder()
@@ -174,13 +181,13 @@ public class AdminServiceImpl implements AdminService{
     public UserPageResponse userPage(Integer userId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         adminRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(AdminNotFound::new);
 
         Customer customer = customerRepository.findById(userId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
-        Score score = scoreRepository.findById(userId)
-                .orElseThrow(RuntimeException::new);
+        Score score = scoreRepository.findByUserId(userId)
+                .orElseThrow(UserNotFound::new);
 
         List<UserReports> reportList = userReportRepository.findByTargetUserId(userId);
 

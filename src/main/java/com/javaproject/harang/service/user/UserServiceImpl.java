@@ -5,6 +5,10 @@ import com.javaproject.harang.entity.report.repository.UserReportRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.TargetNotFound;
+import com.javaproject.harang.exception.UserAlreadyException;
+import com.javaproject.harang.exception.UserAlreadyReport;
+import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.SignUpRequest;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +37,8 @@ public class UserServiceImpl implements UserService{
     @SneakyThrows
     @Override
     public void signUp(SignUpRequest signUpRequest) {
-        customerRepository.findByUserId(signUpRequest.getUserId()).ifPresent(customer -> {
-            throw new RuntimeException();
-        });
+        customerRepository.findByUserId(signUpRequest.getUserId())
+                .ifPresent(customer -> {throw new UserAlreadyException();});
 
         String fileName = UUID.randomUUID().toString();
 
@@ -59,13 +62,13 @@ public class UserServiceImpl implements UserService{
     public void userReport(Integer targetId, String content) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         User target = customerRepository.findById(targetId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(TargetNotFound::new);
 
         userReportRepository.findByUserIdAndTargetId(user.getId(), targetId)
-                .ifPresent(userReport1 -> {throw new RuntimeException();});
+                .ifPresent(userReport1 -> {throw new UserAlreadyReport();});
 
         userReportRepository.save(
                 UserReports.builder()
