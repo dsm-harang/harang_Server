@@ -18,6 +18,7 @@ public class PostListResponse {
     private Integer ageLimit;
     private LocalDateTime createdAt;
     private Integer personnel;
-    private String imageName;
+    private String postImage;
     private Integer score;
+    private String profileImage;
 }
