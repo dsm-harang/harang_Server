@@ -16,9 +16,9 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @DeleteMapping("/user/{userId}")
-    public void userDelete(@PathVariable Integer userId){
-        adminService.userDelete(userId);
+    @DeleteMapping("/user/{targetId}")
+    public void userDelete(@PathVariable Integer targetId){
+        adminService.userDelete(targetId);
     }
 
     @DeleteMapping("post/{postId}")
@@ -27,8 +27,8 @@ public class AdminController {
     }
 
     @DeleteMapping("report/user/{userId}")
-    private void userReportDelete(@PathVariable Integer userId) {
-        adminService.userReportDelete(userId);
+    private void userReportDelete(@PathVariable Integer targetId) {
+        adminService.userReportDelete(targetId);
     }
 
     @DeleteMapping("report/post/{postId}")
