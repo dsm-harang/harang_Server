@@ -1,5 +1,6 @@
 package com.javaproject.harang.entity.member;
 
+import com.javaproject.harang.payload.response.MyPostResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ public class MemberCustomerRepositorylmpl implements MemberCustomerRepository{
     EntityManager entityManager;
 
     @Override
-    public List<MyPostForm> findALLByuserId(Integer userId) {
+    public List<MyPostResponse> findALLByuserId(Integer userId) {
         return entityManager.createQuery("SELECT c.postId FROM Member c " +
                 "WHERE c.userId = :userId")
                 .setParameter("userId", userId)

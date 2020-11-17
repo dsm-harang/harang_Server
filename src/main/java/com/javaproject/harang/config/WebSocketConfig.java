@@ -1,4 +1,4 @@
-package com.javaproject.harang.controller;
+package com.javaproject.harang.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

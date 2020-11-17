@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 @Service
@@ -27,61 +28,82 @@ public class ChatRoomJoinService {
     private final AuthenticationFacade authenticationFacade;
     private final CustomerRepository customerRepository;
     private final NotifyService notifyService;
+
     @Transactional(readOnly = true)
     public List<ChatRoomJoin> findByUser(Customer customer) {
         return chatRoomJoinRepository.findByCustomer(customer);
     }
 
     @Transactional(readOnly = true)
-    public Integer check(Integer userId){
+    public Integer check(Integer userId) {
 
         Customer userFirst = usersService.findById(userId).orElseThrow();
         List<ChatRoomJoin> listFirst = chatRoomJoinRepository.findByCustomer(userFirst);
         Set<ChatRoom> setFirst = new HashSet<>();
-        for(ChatRoomJoin chatRoomJoin : listFirst){
+        for (ChatRoomJoin chatRoomJoin : listFirst) {
             setFirst.add(chatRoomJoin.getChatRoom());
         }
         return 0;
     }
+
     @Transactional
-    public Integer newRoom() {
+    public Integer newRoom(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(RuntimeException::new);
 
-        Integer ret = check(user.getId());
-        if(ret != 0){
-            //이미 존재하는 방이면 해당 방 번호 리턴
-            return ret;
+        try {
+            ChatRoom checkChatRoom = chatRoomRepository.findByPostId(postId).orElseThrow();
+
+            if (checkChatRoom.getPostId().equals(postId)) {
+                return checkChatRoom.getPostId();
+            } else {
+
+                ChatRoom chatRoom = new ChatRoom();
+
+                chatRoom.setStatus("true");
+                chatRoom.setPostId(postId);
+                ChatRoom newChatRoom = chatRoomRepository.save(chatRoom);
+                createRoom(user.getId(), newChatRoom);
+                return newChatRoom.getId();
+            }
+        } catch (NoSuchElementException e){
+
+            ChatRoom chatRoom = new ChatRoom();
+
+            chatRoom.setStatus("true");
+            chatRoom.setPostId(postId);
+            ChatRoom newChatRoom = chatRoomRepository.save(chatRoom);
+            createRoom(user.getId(), newChatRoom);
+            return newChatRoom.getId();
         }
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setStatus("true");
-        ChatRoom newChatRoom = chatRoomRepository.save(chatRoom);
-        createRoom(user.getId(),newChatRoom);
-        return newChatRoom.getId();
     }
+
     @Transactional
-    public Integer addRoom(Integer roomId,Integer userId){
-//        Integer receiptCode = authenticationFacade.getReceiptCode();
-//        Customer token_user = customerRepository.findById(receiptCode)
-//                .orElseThrow(RuntimeException::new);
-        Customer user= customerRepository.findById(userId).orElseThrow();
+    public void addRoom(Integer roomId, Integer userId) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        Customer token_user = customerRepository.findById(receiptCode)
+                .orElseThrow(RuntimeException::new);
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow();
+        ChatRoomJoin chatRoomJoin = chatRoomJoinRepository.findByCustomerAndChatRoom(token_user, chatRoom).orElseThrow();
 
-        notifyService.addChatNotice(user.getId());
-        createRoom(user.getId(),chatRoom);
-
-        return 1;
+        if (token_user.equals(chatRoomJoin.getCustomer())) {
+            notifyService.addChatNotice(userId);
+            createRoom(userId, chatRoom);
+        }
     }
+
     @Transactional
-    public void createRoom(Integer user, ChatRoom chatRoom){
-        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(customerRepository.findById(user).orElseThrow(),chatRoom);
+    public void createRoom(Integer user, ChatRoom chatRoom) {
+        ChatRoomJoin chatRoomJoin = new ChatRoomJoin(customerRepository.findById(user).orElseThrow(), chatRoom);
         chatRoomJoinRepository.save(chatRoomJoin);
     }
+
     @Transactional(readOnly = true)
     public List<ChatRoomJoin> findByChatRoom(ChatRoom chatRoom) {
         return chatRoomJoinRepository.findByChatRoom(chatRoom);
     }
+
     @Transactional
     public void delete(ChatRoomJoin chatRoomJoin) {
         chatRoomJoinRepository.delete(chatRoomJoin);
@@ -89,8 +111,8 @@ public class ChatRoomJoinService {
 
     public String findAnotherUser(ChatRoom chatRoom, String name) {
         List<ChatRoomJoin> chatRoomJoins = findByChatRoom(chatRoom);
-        for(ChatRoomJoin chatRoomJoin : chatRoomJoins){
-            if(!name.equals(chatRoomJoin.getCustomer().getName())){
+        for (ChatRoomJoin chatRoomJoin : chatRoomJoins) {
+            if (!name.equals(chatRoomJoin.getCustomer().getName())) {
                 return chatRoomJoin.getCustomer().getName();
             }
         }

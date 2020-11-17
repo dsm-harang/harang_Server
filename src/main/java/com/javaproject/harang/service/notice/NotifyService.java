@@ -36,7 +36,7 @@ public class NotifyService {
                 .createdAt(LocalDateTime.now())
                 .userId(targetName)
                 .Type(NotifyType.Post)
-                .content("게시물")
+                .content("게시물 신청")
                 .build());
     }
 }

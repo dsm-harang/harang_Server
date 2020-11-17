@@ -1,6 +1,7 @@
 package com.javaproject.harang.service.chat;
 
 import com.javaproject.harang.entity.chat.*;
+import com.javaproject.harang.payload.response.chatresponse.ChatRoomForm;
 import com.javaproject.harang.entity.user.customer.Customer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
