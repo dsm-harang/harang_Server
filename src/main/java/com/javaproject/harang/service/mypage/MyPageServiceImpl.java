@@ -10,6 +10,7 @@ import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.response.*;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
@@ -42,7 +43,8 @@ public class MyPageServiceImpl implements MypageService {
     public Map<String, Object> SeeMyPage() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
+
 
         Map<String, Object> map = new HashMap<>();
 
@@ -58,7 +60,7 @@ public class MyPageServiceImpl implements MypageService {
         Map<String, Object> map = new HashMap<>();
 
         Customer customer = customerRepository.findById(Id)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         map.put("Intro", customer.getIntro());
         map.put("name", customer.getName());
@@ -72,13 +74,13 @@ public class MyPageServiceImpl implements MypageService {
     public Map<String, Object> UpdateMyPage(MyPageUpdateRequest myPageUpdateRequest) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         Map<String, Object> map = new HashMap<>();
         String fileName = UUID.randomUUID().toString();
 
         Customer customer = customerRepository.findById(user.getId())
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         File deleteFile = new File(user.getImagePath());
         deleteFile.delete();
@@ -98,7 +100,8 @@ public class MyPageServiceImpl implements MypageService {
 
     @Override
     public ScoreResponse GetScore(Integer Id) {
-        Customer user = customerRepository.findById(Id).orElseThrow(RuntimeException::new);
+        Customer user = customerRepository.findById(Id).orElseThrow(UserNotFound::new);
+
         List<Score> scores = scoreRepository.findByScoreTargetId(user.getId());
 
         return new ScoreResponse(scores);
@@ -110,7 +113,7 @@ public class MyPageServiceImpl implements MypageService {
 
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
         Member member = memberRepository.findByUserIdAndPostId(user.getId(), postId).orElseThrow();
         try {
             Score scores = scoreRepository.findByUserIdAndScoreTargetId(user.getId(), scoreTargetId).orElseThrow();
@@ -154,7 +157,7 @@ public class MyPageServiceImpl implements MypageService {
     public ListScoreResponse ListScore(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
         List<Member> members = memberRepository.findALLByPostId(postId);
         System.out.println(user.getId());
         List<Member> collect = members.stream()
@@ -163,13 +166,13 @@ public class MyPageServiceImpl implements MypageService {
 
         return new ListScoreResponse(collect);
     }
-
+    
 
     @Override
     public MySeePageResponse MyPost() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
         List<MyPostResponse> member = memberRepository.findALLByuserId(user.getId());
 
         return new MySeePageResponse(member);
@@ -179,7 +182,7 @@ public class MyPageServiceImpl implements MypageService {
     public NotifyResponse MyNotify() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
         List<Notify> notify = notifyRepository.findAllByUserId(user.getId());
 
         return new NotifyResponse(notify);
