@@ -7,9 +7,9 @@ import com.javaproject.harang.payload.response.UserReportResponse;
 import java.util.List;
 
 public interface AdminService {
-    void userDelete(Integer userId);
+    void userDelete(Integer targetId);
     void userPostDelete(Integer postId);
-    void userReportDelete(Integer userId);
+    void userReportDelete(Integer targetId);
     void postReportDelete(Integer postId);
     void score(Integer userId);
     List<PostReportResponse> postReport();
