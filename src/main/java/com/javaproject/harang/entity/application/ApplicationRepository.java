@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ApplicationRepository extends CrudRepository<Application, Integer> {
-    Optional<Application> findByUserIdAndPostIdAndAndStatus(Integer userId, Integer postId, Status status);
+    Optional<Application> findByUserIdAndPostIdAndStatus(Integer userId, Integer postId, Status status);
 }

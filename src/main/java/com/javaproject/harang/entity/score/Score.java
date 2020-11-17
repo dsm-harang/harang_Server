@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
 @Entity
 @AllArgsConstructor
@@ -19,17 +20,15 @@ public class Score {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    //이게 나다
-//    private String scoreName;
     private Integer userId;
 
     private Integer score;
 
-    private LocalDateTime score_at;
+    private LocalDateTime scoreAt;
 
-    private String score_comment;
-    //이게 너다.
-    private Integer score_target_id;
+    private String scoreComment;
+
+    private Integer scoreTargetId;
 
 
 }

@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -38,4 +39,23 @@ public class Customer implements User {
         return AuthorityType.USER;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return Objects.equals(id, customer.id) &&
+                Objects.equals(userId, customer.userId) &&
+                Objects.equals(password, customer.password) &&
+                Objects.equals(name, customer.name) &&
+                Objects.equals(age, customer.age) &&
+                Objects.equals(phoneNumber, customer.phoneNumber) &&
+                Objects.equals(imagePath, customer.imagePath) &&
+                Objects.equals(intro, customer.intro);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userId, password, name, age, phoneNumber, imagePath, intro);
+    }
 }

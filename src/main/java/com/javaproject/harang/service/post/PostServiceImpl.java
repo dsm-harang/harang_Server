@@ -12,7 +12,9 @@ import com.javaproject.harang.entity.report.repository.ReportRepository;
 import com.javaproject.harang.entity.score.Score;
 import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
+import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.*;
 import com.javaproject.harang.payload.request.PostUpdateRequest;
 import com.javaproject.harang.payload.request.PostWriteRequest;
 import com.javaproject.harang.payload.response.GetPostResponse;
@@ -53,7 +55,7 @@ public class PostServiceImpl implements PostService {
     public void postWrite(PostWriteRequest postWriteRequest) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         String fileName = UUID.randomUUID().toString();
 
@@ -75,13 +77,15 @@ public class PostServiceImpl implements PostService {
 
         memberRepository.findByUserIdAndPostId(user.getId(), post.getId())
                 .ifPresent(member -> {
-                    throw new RuntimeException();
+                    throw new MemberAlreadyIncludeException();
                 });
 
         memberRepository.save(
                 Member.builder()
                         .postId(post.getId())
                         .userId(user.getId())
+                        .userName(user.getName())
+                        .imagePath(user.getImagePath())
                         .build()
         );
 
@@ -94,12 +98,12 @@ public class PostServiceImpl implements PostService {
     public void postUpdate(Integer postId, PostUpdateRequest postUpdateRequest) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(PostNotFound::new);
 
-        if (!user.getId().equals(post.getUserId())) throw new RuntimeException();
+        if (!user.getId().equals(post.getUserId())) throw new WriterNotFound();
 
         if (postUpdateRequest.getImage() != null) {
 
@@ -131,15 +135,15 @@ public class PostServiceImpl implements PostService {
     public void postDelete(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(PostNotFound::new);
 
-        if (!user.getId().equals(post.getUserId())) throw new RuntimeException();
+        if (!user.getId().equals(post.getUserId())) throw new WriterNotFound();
 
         Post postImage = postRepository.findById(postId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(PostNotFound::new);
 
         File fileName = new File(post.getImage());
         fileName.getName();
@@ -156,10 +160,10 @@ public class PostServiceImpl implements PostService {
     public GetPostResponse getPost(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(PostNotFound::new);
 
         boolean isMine;
 
@@ -188,11 +192,15 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = (List<Post>) postRepository.findAll();
 
         for (Post post : posts) {
-
             Score score = scoreRepository.findByUserId(post.getUserId())
                     .orElseThrow(RuntimeException::new);
 
+            Customer customer = customerRepository.findById(post.getUserId())
+                    .orElseThrow(UserNotFound::new);
+
+            File file = new File(customer.getImagePath());
             File fileName = new File(post.getImage());
+
             list.add(
                     PostListResponse.builder()
                             .postId(post.getId())
@@ -206,7 +214,8 @@ public class PostServiceImpl implements PostService {
                             .ageLimit(post.getAgeLimit())
                             .createdAt(post.getCreatedAt())
                             .personnel(post.getPersonnel())
-                            .imageName(fileName.getName())
+                            .postImage(fileName.getName())
+                            .profileImage(file.getName())
                             .build()
             );
         }
@@ -217,14 +226,16 @@ public class PostServiceImpl implements PostService {
     public void accept(Integer applicationId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(ApplicationNotFound::new);
 
         Post posts = postRepository.findById(application.getPostId())
                 .filter(post -> user.getId().equals(post.getUserId()))
                 .orElseThrow(RuntimeException::new);
+
+        User username = customerRepository.findById(application.getUserId()).orElseThrow();
 
         application.accept();
 
@@ -232,6 +243,8 @@ public class PostServiceImpl implements PostService {
                 Member.builder()
                         .postId(posts.getId())
                         .userId(application.getUserId())
+                        .userName(username.getName())
+                        .imagePath(username.getImagePath())
                         .build()
         );
     }
@@ -240,24 +253,24 @@ public class PostServiceImpl implements PostService {
     public void sendPost(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(PostNotFound::new);
 
-        if (user.getUserId().equals(post.getUserId())) throw new RuntimeException();
+        if (user.getUserId().equals(post.getUserId())) throw new WriterNotFound();
 
         Integer memberCount = memberRepository.countAllByPostId(postId);
         if (memberCount >= post.getPersonnel()) throw new RuntimeException();
 
-        applicationRepository.findByUserIdAndPostIdAndAndStatus(user.getId(), postId, Status.READY)
+        applicationRepository.findByUserIdAndPostIdAndStatus(user.getId(), postId, Status.READY)
                 .ifPresent(application -> {
-                    throw new RuntimeException();
+                    throw new ApplicationAlreadyException();
                 });
 
         memberRepository.findByUserIdAndPostId(user.getId(), postId)
                 .ifPresent(member -> {
-                    throw new RuntimeException();
+                    throw new MemberAlreadyIncludeException();
                 });
 
         applicationRepository.save(
@@ -275,10 +288,10 @@ public class PostServiceImpl implements PostService {
     public void report(Integer postId, String content) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         reportRepository.findByUserIdAndPostId(user.getId(), postId)
-                .ifPresent(report -> {throw new RuntimeException();});
+                .ifPresent(report -> {throw new ReportAlreadyException();});
 
         reportRepository.save(
                 Report.builder()
@@ -306,7 +319,7 @@ public class PostServiceImpl implements PostService {
                         .ageLimit(post.getAgeLimit())
                         .createdAt(post.getCreatedAt())
                         .personnel(post.getPersonnel())
-                        .imageName(fileName.getName())
+                        .postImage(fileName.getName())
                         .build()
             );
         }

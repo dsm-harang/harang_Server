@@ -18,9 +18,9 @@ public interface MypageService {
 
     ScoreResponse GetScore(Integer Id);
 
-    Map<String, Object> SendScore(Integer postId, Integer score, String score_content, Integer score_target_id);
+    Map<String, Object> SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId);
 
-    ListScoreResponse ListScore();
+    ListScoreResponse ListScore(Integer postId);
 
     MySeePageResponse MyPost();
 

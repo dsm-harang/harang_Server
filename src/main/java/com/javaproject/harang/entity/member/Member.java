@@ -22,4 +22,9 @@ public class Member {
 
     private Integer userId;
 
+    private String userName;
+
+    private String imagePath;
+
+
 }

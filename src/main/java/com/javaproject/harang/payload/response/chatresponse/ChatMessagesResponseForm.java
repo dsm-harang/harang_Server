@@ -1,4 +1,6 @@
-package com.javaproject.harang.entity.chat;
+package com.javaproject.harang.payload.response.chatresponse;
+
+import com.javaproject.harang.entity.chat.ChatMessage;
 
 import java.util.List;
 
