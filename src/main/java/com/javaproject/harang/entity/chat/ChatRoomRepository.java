@@ -10,5 +10,6 @@ import java.util.Optional;
 
 public interface ChatRoomRepository extends CrudRepository<ChatRoom,Integer> {
     Optional<ChatRoom> findById(Integer id);
+    Optional<ChatRoom> findByPostId(Integer PostId);
 
 }

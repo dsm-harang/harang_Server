@@ -25,12 +25,12 @@ public class ChatMessage {
 
 
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false,insertable = false, updatable = false)
+    @JoinColumn(name = "room_id", nullable = false)
     @JsonBackReference
     private ChatRoom chatRoom;
 
     @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "id",nullable = false,insertable = false, updatable = false)
+    @JoinColumn(name = "user_id",referencedColumnName = "id",nullable = false)
     private Customer writer;
 
     public ChatMessage(String message, LocalDateTime time, ChatRoom chatRoom, Customer writer){

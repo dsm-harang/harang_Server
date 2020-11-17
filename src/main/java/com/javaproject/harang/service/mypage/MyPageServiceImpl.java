@@ -22,6 +22,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -155,11 +156,14 @@ public class MyPageServiceImpl implements MypageService {
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(RuntimeException::new);
         List<Member> members = memberRepository.findALLByPostId(postId);
+        System.out.println(user.getId());
         List<Member> collect = members.stream()
                 .filter(m -> !m.getUserId().equals(user.getId()))
                 .collect(Collectors.toList());
+
         return new ListScoreResponse(collect);
     }
+
 
     @Override
     public MySeePageResponse MyPost() {

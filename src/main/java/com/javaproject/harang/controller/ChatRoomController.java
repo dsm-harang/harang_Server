@@ -22,6 +22,7 @@ public class ChatRoomController {
     private final ChatRoomJoinService chatRoomJoinService;
     private final ChatRoomService chatRoomService;
     private final ChatMessageRepository chatMessageRepository;
+    private final ChatRoomJoinRepository chatRoomJoinRepository;
     private final ChatRoomRepository chatRoomRepository;
 
     @GetMapping("/chat")
@@ -46,22 +47,27 @@ public class ChatRoomController {
     }
 
     @PutMapping("/chat/{chatRoomId}")
-    public Integer closeChat(@PathVariable("chatRoomId") Integer chatRoomId) {
+    public void closeChat(@PathVariable("chatRoomId") Integer chatRoomId) {
         ChatRoom chatRoom = chatRoomService.findById(chatRoomId).orElseThrow();
-        chatRoom.setStatus("close");
-        chatRoomRepository.save(chatRoom);
-        return 1;
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        Customer customer = customerRepository.findById(receiptCode)
+                .orElseThrow(RuntimeException::new);
+        ChatRoomJoin chatRoomJoin = chatRoomJoinRepository.findByCustomerAndChatRoom(customer, chatRoom).orElseThrow();
+        if (customer.equals(chatRoomJoin.getCustomer())) {
+            chatRoom.setStatus("close");
+            chatRoomRepository.save(chatRoom);
+        }
     }
 
-    @PostMapping("/chat/newChat")
-    public Integer newChat() {
-        Integer chatRoomId = chatRoomJoinService.newRoom();
+    @PostMapping("/chat/newChat/{postId}")
+    public Integer newChat(@PathVariable("postId") Integer postId) {
+        Integer chatRoomId = chatRoomJoinService.newRoom(postId);
         return chatRoomId;
     }
 
     @PostMapping("/chat/addChat")
-    public Integer addChat(@RequestParam Integer userId, @RequestParam Integer roomId) {
-        return chatRoomJoinService.addRoom(roomId, userId);
+        public void addChat(@RequestParam Integer userId, @RequestParam Integer roomId) {
+        chatRoomJoinService.addRoom(roomId, userId);
     }
 
     @RequestMapping("/chat/{chatRoomId}")
@@ -73,34 +79,32 @@ public class ChatRoomController {
                 .orElseThrow(RuntimeException::new);
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow();
         List<ChatMessage> messages = chatRoom.getMessages();
-
-        for (ChatMessage c : messages) {
-            System.out.println(c.getMessage());
-            System.out.println("----------------");
-        }
-        Collections.sort(messages, (t1, t2) -> {
-            if (t1.getId() > t2.getId()) return -1;
-            else return 1;
-        });
-        if (customer == null) {
-            form.setUserName("");
-            form.setUserId(0);
-        } else {
-            form.setUserName(customer.getName());
-            form.setUserId(customer.getId());
-        }
-        List<ChatRoomJoin> list = chatRoomJoinService.findByChatRoom(chatRoom);
-        form.setMessages(messages);
-        form.setChatRoomId(chatRoom.getId());
-        int cnt = 0;
-        for (ChatRoomJoin join : list) {
-            if (!join.getCustomer().getName().equals(customer.getName())) {
-                form.setReceiver(join.getCustomer().getName());
-                ++cnt;
+        ChatRoomJoin chatRoomJoin = chatRoomJoinRepository.findByCustomerAndChatRoom(customer, chatRoom).orElseThrow();
+        if (customer.equals(chatRoomJoin.getCustomer())) {
+            Collections.sort(messages, (t1, t2) -> {
+                if (t1.getId() > t2.getId()) return -1;
+                else return 1;
+            });
+            if (customer == null) {
+                form.setUserName("");
+                form.setUserId(0);
+            } else {
+                form.setUserName(customer.getName());
+                form.setUserId(customer.getId());
             }
-        }
-        if(cnt == 0){
-            form.setReceiver("0");
+            List<ChatRoomJoin> list = chatRoomJoinService.findByChatRoom(chatRoom);
+            form.setMessages(messages);
+            form.setChatRoomId(chatRoom.getId());
+            int cnt = 0;
+            for (ChatRoomJoin join : list) {
+                if (!join.getCustomer().getName().equals(customer.getName())) {
+                    form.setReceiver(join.getCustomer().getName());
+                    ++cnt;
+                }
+            }
+            if (cnt == 0) {
+                form.setReceiver("0");
+            }
         }
         return form;
     }

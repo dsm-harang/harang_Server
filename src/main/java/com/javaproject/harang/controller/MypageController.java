@@ -69,5 +69,6 @@ public class MypageController {
         return mypageService.MyNotify();
     }
 
+
 }
 

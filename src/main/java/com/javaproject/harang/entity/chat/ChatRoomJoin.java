@@ -16,11 +16,11 @@ public class ChatRoomJoin {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name =  "user_id", nullable = false,insertable = false, updatable = false)
+    @JoinColumn(name =  "user_id", nullable = false)
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false,insertable = false, updatable = false)
+    @JoinColumn(name = "room_id", nullable = false)
     private ChatRoom chatRoom;
 
     public ChatRoomJoin(Customer customer , ChatRoom chatRoom){
