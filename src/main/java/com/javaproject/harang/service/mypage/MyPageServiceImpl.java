@@ -1,5 +1,6 @@
 package com.javaproject.harang.service.mypage;
 
+import com.javaproject.harang.entity.Post.Post;
 import com.javaproject.harang.entity.Post.PostRepository;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
@@ -10,12 +11,17 @@ import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.MemberNotFound;
+import com.javaproject.harang.exception.ScoreNotFound;
 import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.response.*;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
+import com.javaproject.harang.service.notice.NotifyService;
+import com.javaproject.harang.service.notice.NotifyServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +29,6 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +39,8 @@ public class MyPageServiceImpl implements MypageService {
     private final ScoreRepository scoreRepository;
     private final MemberRepository memberRepository;
     private final NotifyRepository notifyRepository;
+    private final NotifyService notifyService;
+    private final NotifyServiceImpl notifyServiceImpl;
     private final PostRepository postRepository;
 
     @Value("${image.file.path}")
@@ -114,7 +121,7 @@ public class MyPageServiceImpl implements MypageService {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
-        Member member = memberRepository.findByUserIdAndPostId(user.getId(), postId).orElseThrow();
+        Member member = memberRepository.findByUserIdAndPostId(user.getId(), postId).orElseThrow(MemberNotFound::new);
         try {
             Score scores = scoreRepository.findByUserIdAndScoreTargetId(user.getId(), scoreTargetId).orElseThrow();
             if (scores.getScoreTargetId().equals(scoreTargetId)) {
@@ -147,6 +154,8 @@ public class MyPageServiceImpl implements MypageService {
                                 .build()
                 );
             }
+        }catch (RuntimeException e) {
+            throw new ScoreNotFound();
         }
         map.put("message", "success");
 
@@ -159,7 +168,6 @@ public class MyPageServiceImpl implements MypageService {
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
         List<Member> members = memberRepository.findALLByPostId(postId);
-        System.out.println(user.getId());
         List<Member> collect = members.stream()
                 .filter(m -> !m.getUserId().equals(user.getId()))
                 .collect(Collectors.toList());
@@ -174,17 +182,8 @@ public class MyPageServiceImpl implements MypageService {
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
         List<MyPostResponse> member = memberRepository.findALLByuserId(user.getId());
-
         return new MySeePageResponse(member);
     }
 
-    @Override
-    public NotifyResponse MyNotify() {
-        Integer receiptCode = authenticationFacade.getReceiptCode();
-        User user = customerRepository.findById(receiptCode)
-                .orElseThrow(UserNotFound::new);
-        List<Notify> notify = notifyRepository.findAllByUserId(user.getId());
 
-        return new NotifyResponse(notify);
-    }
 }

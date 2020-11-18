@@ -24,5 +24,4 @@ public interface MypageService {
 
     MySeePageResponse MyPost();
 
-    NotifyResponse MyNotify();
 }

@@ -64,10 +64,6 @@ public class MypageController {
         return mypageService.MyPost();
     }
 
-    @GetMapping("/notify")
-    public NotifyResponse MyNotify() {
-        return mypageService.MyNotify();
-    }
 
 
 }

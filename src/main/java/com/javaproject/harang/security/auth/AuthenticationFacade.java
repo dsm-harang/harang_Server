@@ -1,5 +1,7 @@
 package com.javaproject.harang.security.auth;
 
+import com.javaproject.harang.exception.TokenNotFound;
+import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.security.AuthorityType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,13 +22,18 @@ public class AuthenticationFacade {
         return ((AuthDetails) this.getAuthentication().getPrincipal()).getAuthorityType();
     }
 
-    public Integer getReceiptCode(){
+
+    public Integer getReceiptCode() {
         Authentication auth = this.getAuthentication();
-        if(auth.getPrincipal() instanceof  AuthDetails){
+        if (auth.getPrincipal() instanceof AuthDetails) {
             return ((AuthDetails) auth.getPrincipal()).getUser().getId();
-        }else {
+        } else {
             return Integer.parseInt(this.getAuthentication().getName());
         }
-    }
 
+
+    }
 }
+
+
+

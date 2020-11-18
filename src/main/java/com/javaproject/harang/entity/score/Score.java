@@ -2,10 +2,7 @@ package com.javaproject.harang.entity.score;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -21,7 +18,7 @@ public class Score {
     private Integer id;
 
     private Integer userId;
-
+    @Column(name="score",nullable = false,columnDefinition = "0")
     private Integer score;
 
     private LocalDateTime scoreAt;

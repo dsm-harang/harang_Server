@@ -26,6 +26,8 @@ public class Notify {
 
     private LocalDateTime createdAt;
 
+    private String name;
+
     private NotifyType Type;
 
 }
