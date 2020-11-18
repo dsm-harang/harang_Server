@@ -2,13 +2,11 @@ package com.javaproject.harang.entity.score;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
 @Entity
 @AllArgsConstructor
@@ -19,17 +17,15 @@ public class Score {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    //이게 나다
-//    private String scoreName;
     private Integer userId;
-
+    @Column(name="score",nullable = false,columnDefinition = "0")
     private Integer score;
 
-    private LocalDateTime score_at;
+    private LocalDateTime scoreAt;
 
-    private String score_comment;
-    //이게 너다.
-    private Integer score_target_id;
+    private String scoreComment;
+
+    private Integer scoreTargetId;
 
 
 }

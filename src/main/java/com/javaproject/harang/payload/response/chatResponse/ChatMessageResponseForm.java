@@ -1,8 +1,8 @@
-package com.javaproject.harang.entity.chat;
+package com.javaproject.harang.payload.response.chatresponse;
 
+import com.javaproject.harang.entity.chat.ChatRoom;
 import com.javaproject.harang.entity.user.customer.Customer;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 public class ChatMessageResponseForm {

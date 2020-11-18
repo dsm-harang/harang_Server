@@ -1,5 +1,7 @@
 package com.javaproject.harang.entity.chat;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.javaproject.harang.entity.user.customer.Customer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,11 +25,12 @@ public class ChatMessage {
 
 
     @ManyToOne
-    @JoinColumn(name = "room_id", nullable = false,insertable = false, updatable = false)
+    @JoinColumn(name = "room_id", nullable = false)
+    @JsonBackReference
     private ChatRoom chatRoom;
 
     @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "id",nullable = false,insertable = false, updatable = false)
+    @JoinColumn(name = "user_id",referencedColumnName = "id",nullable = false)
     private Customer writer;
 
     public ChatMessage(String message, LocalDateTime time, ChatRoom chatRoom, Customer writer){

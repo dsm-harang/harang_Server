@@ -12,7 +12,7 @@ import javax.persistence.Id;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class  Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,5 +21,10 @@ public class Member {
     private Integer postId;
 
     private Integer userId;
+
+    private String userName;
+
+    private String imagePath;
+
 
 }

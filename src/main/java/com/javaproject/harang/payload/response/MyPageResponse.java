@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @Builder
 @AllArgsConstructor
-public class MypageResponse {
+public class MyPageResponse {
 
     private String name;
 

@@ -1,7 +1,8 @@
 package com.javaproject.harang.service.mypage;
 
+import com.javaproject.harang.entity.Post.Post;
+import com.javaproject.harang.entity.Post.PostRepository;
 import com.javaproject.harang.entity.member.Member;
-import com.javaproject.harang.entity.member.MyPostForm;
 import com.javaproject.harang.entity.member.MemberRepository;
 import com.javaproject.harang.entity.notify.Notify;
 import com.javaproject.harang.entity.notify.NotifyRepository;
@@ -10,33 +11,38 @@ import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.MemberNotFound;
+import com.javaproject.harang.exception.ScoreNotFound;
+import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
-import com.javaproject.harang.payload.response.ListScoreResponse;
-import com.javaproject.harang.payload.response.NotifyResponse;
-import com.javaproject.harang.payload.response.MySeePageResponse;
-import com.javaproject.harang.payload.response.ScoreResponse;
+import com.javaproject.harang.payload.response.*;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
+import com.javaproject.harang.service.notice.NotifyService;
+import com.javaproject.harang.service.notice.NotifyServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MyPageServiceImpl implements MypageService {
 
     private final CustomerRepository customerRepository;
-
     private final AuthenticationFacade authenticationFacade;
     private final ScoreRepository scoreRepository;
     private final MemberRepository memberRepository;
-    private final EntityManager entityManager;
     private final NotifyRepository notifyRepository;
+    private final NotifyService notifyService;
+    private final NotifyServiceImpl notifyServiceImpl;
+    private final PostRepository postRepository;
+
     @Value("${image.file.path}")
     private String imagePath;
 
@@ -44,7 +50,8 @@ public class MyPageServiceImpl implements MypageService {
     public Map<String, Object> SeeMyPage() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
+
 
         Map<String, Object> map = new HashMap<>();
 
@@ -60,7 +67,7 @@ public class MyPageServiceImpl implements MypageService {
         Map<String, Object> map = new HashMap<>();
 
         Customer customer = customerRepository.findById(Id)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         map.put("Intro", customer.getIntro());
         map.put("name", customer.getName());
@@ -74,13 +81,13 @@ public class MyPageServiceImpl implements MypageService {
     public Map<String, Object> UpdateMyPage(MyPageUpdateRequest myPageUpdateRequest) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         Map<String, Object> map = new HashMap<>();
         String fileName = UUID.randomUUID().toString();
 
         Customer customer = customerRepository.findById(user.getId())
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
 
         File deleteFile = new File(user.getImagePath());
         deleteFile.delete();
@@ -100,75 +107,83 @@ public class MyPageServiceImpl implements MypageService {
 
     @Override
     public ScoreResponse GetScore(Integer Id) {
-        Customer user = customerRepository.findById(Id).orElseThrow(RuntimeException::new);
-        List<Score> scores = scoreRepository.findAllByUserId(user.getId());
+        Customer user = customerRepository.findById(Id).orElseThrow(UserNotFound::new);
 
+        List<Score> scores = scoreRepository.findByScoreTargetId(user.getId());
 
         return new ScoreResponse(scores);
     }
 
     @Override
-    public Map<String, Object> SendScore(Integer postId, Integer score, String score_content, Integer score_target_id) {
+    public Map<String, Object> SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId) {
         Map<String, Object> map = new HashMap<>();
 
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
-        Member member = memberRepository.findByPostId(postId).orElseThrow();
-
-        if (user.getId().equals(member.getUserId())) {
-            scoreRepository.save(
-                    Score.builder()
-                            .score(score)
-                            .score_at(LocalDateTime.now())
-                            .score_comment(score_content)
-                            .score_target_id(score_target_id)
-                            .userId(user.getId())
-                            .build()
-            );
-            map.put("message", "success");
+                .orElseThrow(UserNotFound::new);
+        Member member = memberRepository.findByUserIdAndPostId(user.getId(), postId).orElseThrow(MemberNotFound::new);
+        try {
+            Score scores = scoreRepository.findByUserIdAndScoreTargetId(user.getId(), scoreTargetId).orElseThrow();
+            if (scores.getScoreTargetId().equals(scoreTargetId)) {
+                scores.setScore(score);
+                scores.setScoreAt(LocalDateTime.now());
+                scores.setScoreComment(scoreContent);
+                scoreRepository.save(scores);
+            } else {
+                if (user.getId().equals(member.getUserId())) {
+                    scoreRepository.save(
+                            Score.builder()
+                                    .score(score)
+                                    .scoreAt(LocalDateTime.now())
+                                    .scoreComment(scoreContent)
+                                    .scoreTargetId(scoreTargetId)
+                                    .userId(user.getId())
+                                    .build()
+                    );
+                }
+            }
+        } catch (NoSuchElementException e) {
+            if (user.getId().equals(member.getUserId())) {
+                scoreRepository.save(
+                        Score.builder()
+                                .score(score)
+                                .scoreAt(LocalDateTime.now())
+                                .scoreComment(scoreContent)
+                                .scoreTargetId(scoreTargetId)
+                                .userId(user.getId())
+                                .build()
+                );
+            }
+        }catch (RuntimeException e) {
+            throw new ScoreNotFound();
         }
+        map.put("message", "success");
 
         return map;
     }
 
     @Override
-    public ListScoreResponse ListScore() {
-        List<com.javaproject.harang.controller.ScoreListResponse> list = new ArrayList<>();
+    public ListScoreResponse ListScore(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(UserNotFound::new);
+        List<Member> members = memberRepository.findALLByPostId(postId);
+        List<Member> collect = members.stream()
+                .filter(m -> !m.getUserId().equals(user.getId()))
+                .collect(Collectors.toList());
 
-//        Member member = memberRepository.findByUserId(user.getId()).orElseThrow();
-        List<MyPostForm> postForms =memberRepository.findALLByuserId(user.getId());
-        List<Member> members = new ArrayList<>();
-        postForms.stream()
-                .forEach(p -> {
-                    members.addAll(memberRepository.findALLByPostId(p.getPostId()));
-                });
-//        List<Member> memberList = memberRepository.findByAllUserId(member);
-
-        // return members;
-        return new ListScoreResponse(members);
+        return new ListScoreResponse(collect);
     }
+    
 
     @Override
     public MySeePageResponse MyPost() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
-        List<MyPostForm> member =memberRepository.findALLByuserId(user.getId());
-
-        System.out.println(member);
+                .orElseThrow(UserNotFound::new);
+        List<MyPostResponse> member = memberRepository.findALLByuserId(user.getId());
         return new MySeePageResponse(member);
     }
 
-    @Override
-    public NotifyResponse MyNotify() {
-        Integer receiptCode = authenticationFacade.getReceiptCode();
-        User user = customerRepository.findById(receiptCode)
-                .orElseThrow(RuntimeException::new);
-        List<Notify> notify = notifyRepository.findAllByUserId(user.getId());
-        return new NotifyResponse(notify);
-    }
+
 }

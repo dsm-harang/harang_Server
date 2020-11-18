@@ -1,6 +1,6 @@
 package com.javaproject.harang.controller;
 
-import com.javaproject.harang.entity.chat.ChatMessageForm;
+import com.javaproject.harang.payload.response.chatResponse.ChatMessageForm;
 import com.javaproject.harang.service.chat.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
