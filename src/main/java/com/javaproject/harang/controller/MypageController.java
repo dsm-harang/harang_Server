@@ -49,14 +49,14 @@ public class MypageController {
     @PostMapping("/score")
     public Map<String, Object> SendScore(@RequestParam Integer score,
                                          @RequestParam Integer postId,
-                                         @RequestParam String score_content,
-                                         @RequestParam Integer score_target_id) {
-        return mypageService.SendScore(postId, score, score_content, score_target_id);
+                                         @RequestParam String scoreContent,
+                                         @RequestParam Integer scoreTargetId) {
+        return mypageService.SendScore(postId, score, scoreContent, scoreTargetId);
     }
 
-    @GetMapping("/score")
-    public ListScoreResponse ListScore() {
-        return mypageService.ListScore();
+    @GetMapping("/scoreList/{postId}")
+    public ListScoreResponse ListScore(@PathVariable("postId") Integer postId) {
+        return mypageService.ListScore(postId);
     }
 
     @GetMapping("/post")
@@ -68,6 +68,7 @@ public class MypageController {
     public NotifyResponse MyNotify() {
         return mypageService.MyNotify();
     }
+
 
 }
 

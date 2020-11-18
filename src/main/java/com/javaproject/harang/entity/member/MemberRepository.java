@@ -27,6 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Integer>, Member
     @Query("SELECT c FROM Member c WHERE c.userId=:userId")
     List<Member> findByAllUserId(Integer userId);
 
+
     }
 
 

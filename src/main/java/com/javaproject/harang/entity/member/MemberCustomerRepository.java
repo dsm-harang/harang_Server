@@ -1,10 +1,10 @@
 package com.javaproject.harang.entity.member;
 
-import com.javaproject.harang.entity.user.User;
+import com.javaproject.harang.payload.response.MyPostResponse;
 
 import java.util.List;
 
 public interface MemberCustomerRepository {
-    List<MyPostForm> findALLByuserId(Integer postId);
+    List<MyPostResponse> findALLByuserId(Integer postId);
     List<Member> findALLByPostId(int postId);
 }

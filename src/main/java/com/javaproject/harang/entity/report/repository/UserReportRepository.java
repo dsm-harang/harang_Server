@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface UserReportRepository extends CrudRepository<UserReports, Integer> {
     Optional<UserReports> findByUserIdAndTargetId(Integer userId, Integer targetId);
-    List<UserReports> findByTargetUserId(Integer targetId);
+    List<UserReports> findByTargetId(Integer targetId);
 }

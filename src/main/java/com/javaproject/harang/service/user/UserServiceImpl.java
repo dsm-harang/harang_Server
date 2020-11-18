@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(TargetNotFound::new);
 
         userReportRepository.findByUserIdAndTargetId(user.getId(), targetId)
-                .ifPresent(userReport1 -> {throw new UserAlreadyReport();});
+                .ifPresent(userReport -> {throw new UserAlreadyReport();});
 
         userReportRepository.save(
                 UserReports.builder()
