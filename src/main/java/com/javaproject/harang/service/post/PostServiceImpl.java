@@ -17,6 +17,7 @@ import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.exception.*;
 import com.javaproject.harang.payload.request.PostUpdateRequest;
 import com.javaproject.harang.payload.request.PostWriteRequest;
+import com.javaproject.harang.payload.response.AcceptListResponse;
 import com.javaproject.harang.payload.response.GetPostResponse;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
@@ -324,6 +325,40 @@ public class PostServiceImpl implements PostService {
             );
         }
         return list;
+    }
+
+    @Override
+    public List<AcceptListResponse> acceptPostList(Integer postId) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        User user = customerRepository.findById(receiptCode)
+                .orElseThrow(UserNotFound::new);
+
+        Post post = postRepository.findByUserId(postId)
+                .orElseThrow(PostNotFound::new);
+
+        if (!user.getId().equals(post.getUserId())) throw new RuntimeException();
+
+        List<Application> applicationList = applicationRepository.findByPostId(postId);
+
+        List<AcceptListResponse> acceptList = new ArrayList<>();
+        for (Application application : applicationList) {
+
+            Customer customer = customerRepository.findById(application.getUserId())
+                    .orElseThrow(UserNotFound::new);
+
+            Score score = scoreRepository.findByUserId(application.getUserId())
+                    .orElseThrow(UserNotFound::new);
+
+            File file = new File(customer.getImagePath());
+            acceptList.add(
+                    AcceptListResponse.builder()
+                            .userName(customer.getName())
+                            .score(score.getScore())
+                            .imageName(file.getName())
+                            .build()
+            );
+        }
+        return acceptList;
     }
 
     private <T> void setIfNotNull(Consumer<T> setter, T value) {

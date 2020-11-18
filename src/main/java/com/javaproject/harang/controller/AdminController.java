@@ -26,7 +26,7 @@ public class AdminController {
         adminService.userPostDelete(postId);
     }
 
-    @DeleteMapping("report/user/{userId}")
+    @DeleteMapping("report/user/{targetId}")
     private void userReportDelete(@PathVariable Integer targetId) {
         adminService.userReportDelete(targetId);
     }
