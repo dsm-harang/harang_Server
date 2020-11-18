@@ -19,6 +19,7 @@ public interface ScoreRepository extends CrudRepository<Score, Integer> {
     @Query("SELECT c FROM Score c WHERE c.scoreTargetId=:scoreTargetId")
     List<Score> findByScoreTargetId(Integer scoreTargetId);
 
+    Optional<Score> deleteByUserId(Integer userId);
     Optional<Score> findByUserIdAndScoreTargetId(Integer userId, Integer scoreTargetId);
 }
 

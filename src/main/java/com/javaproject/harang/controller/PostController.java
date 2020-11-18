@@ -2,6 +2,7 @@ package com.javaproject.harang.controller;
 
 import com.javaproject.harang.payload.request.PostUpdateRequest;
 import com.javaproject.harang.payload.request.PostWriteRequest;
+import com.javaproject.harang.payload.response.AcceptListResponse;
 import com.javaproject.harang.payload.response.GetPostResponse;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.service.post.PostService;
@@ -101,5 +102,10 @@ public class PostController {
     @GetMapping("/tag")
     public List<PostListResponse> searchTag(@RequestParam String tag) {
         return postService.searchTag(tag);
+    }
+
+    @GetMapping("/accept/list/{postId}")
+    public List<AcceptListResponse> acceptPostList(@PathVariable Integer postId){
+        return postService.acceptPostList(postId);
     }
 }

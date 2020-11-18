@@ -55,7 +55,7 @@ public class AdminServiceImpl implements AdminService{
         Customer user = customerRepository.findById(targetId)
                 .orElseThrow(UserNotFound::new);
 
-        List<UserReports> userReports = userReportRepository.findByTargetUserId(targetId);
+        List<UserReports> userReports = userReportRepository.findByTargetId(targetId);
         if (userReports.size() < 0) throw new TargetNotFound();
 
         for (UserReports userReports1 : userReports) {
@@ -65,6 +65,7 @@ public class AdminServiceImpl implements AdminService{
 
         customerRepository.deleteById(user.getId());
         customerRepository.delete(user);
+        scoreRepository.deleteByUserId(user.getId());
 
     }
 
@@ -94,7 +95,7 @@ public class AdminServiceImpl implements AdminService{
         adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
 
-        List<UserReports> userReports = userReportRepository.findByTargetUserId(targetId);
+        List<UserReports> userReports = userReportRepository.findByTargetId(targetId);
         if (userReports.size() < 0) throw new TargetNotFound();
 
         for (UserReports userReports1 : userReports) {
@@ -122,11 +123,11 @@ public class AdminServiceImpl implements AdminService{
         adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
 
-        Score score = scoreRepository.findById(userId)
+        Score score = scoreRepository.findByUserId(userId)
                 .orElseThrow(UserNotFound::new);
 
-        scoreRepository.deleteById(score.getId());
-        scoreRepository.delete(score);
+        score.setScore(0);
+        scoreRepository.save(score);
     }
 
     @Override
@@ -137,7 +138,7 @@ public class AdminServiceImpl implements AdminService{
 
         List<PostReportResponse> list = new ArrayList<>();
         for (Report report : reportRepository.findAll()) {
-            Post post = postRepository.findById(report.getId())
+            Post post = postRepository.findById(report.getPostId())
                     .orElseThrow(UserNotFound::new);
 
             list.add(
@@ -189,7 +190,7 @@ public class AdminServiceImpl implements AdminService{
         Score score = scoreRepository.findByUserId(userId)
                 .orElseThrow(UserNotFound::new);
 
-        List<UserReports> reportList = userReportRepository.findByTargetUserId(userId);
+        List<UserReports> reportList = userReportRepository.findByTargetId(userId);
 
         List<String> contents = new ArrayList<>();
         for(UserReports report :  reportList){
