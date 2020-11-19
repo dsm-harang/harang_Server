@@ -194,8 +194,8 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = (List<Post>) postRepository.findAll();
 
         for (Post post : posts) {
-//            Score score = scoreRepository.findByUserId(post.getUserId())
-//                    .orElseThrow(RuntimeException::new);
+            Score score = scoreRepository.findByUserId(post.getUserId())
+                    .orElseThrow(RuntimeException::new);
 
             Customer customer = customerRepository.findById(post.getUserId())
                     .orElseThrow(UserNotFound::new);
@@ -210,7 +210,7 @@ public class PostServiceImpl implements PostService {
             list.add(
                     PostListResponse.builder()
                             .postId(post.getId())
-                            .score(1)
+                            .score(score.getScore())
                             .userId(post.getUserId())
                             .title(post.getTitle())
                             .content(post.getContent())
