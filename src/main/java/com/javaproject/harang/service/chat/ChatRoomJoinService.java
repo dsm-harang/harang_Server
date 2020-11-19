@@ -6,6 +6,8 @@ import com.javaproject.harang.entity.chat.ChatRoom;
 import com.javaproject.harang.entity.chat.ChatRoomJoin;
 import com.javaproject.harang.entity.chat.ChatRoomJoinRepository;
 import com.javaproject.harang.entity.chat.ChatRoomRepository;
+import com.javaproject.harang.entity.member.Member;
+import com.javaproject.harang.entity.member.MemberRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
@@ -30,6 +32,7 @@ public class ChatRoomJoinService {
     private final CustomerRepository customerRepository;
     private final NotifyServiceImpl notifyService;
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
     public List<ChatRoomJoin> findByUser(Customer customer) {
@@ -78,6 +81,8 @@ public class ChatRoomJoinService {
                 .orElseThrow(UserNotFound::new);
         Customer customer = customerRepository.findById(userId).orElseThrow(UserNotFound::new);
         ChatRoom chatRoom = chatRoomRepository.findById(roomId).orElseThrow(UserNotFound::new);
+        memberRepository.findByUserIdAndPostId(userId,chatRoom.getPostId()).orElseThrow(UserNotFound::new);
+        memberRepository.findByUserIdAndPostId(token_user.getId(),chatRoom.getPostId()).orElseThrow(UserNotFound::new);
         ChatRoomJoin chatRoomJoin = chatRoomJoinRepository.findByCustomerAndChatRoom(token_user, chatRoom).orElseThrow(ChatRoomJoinNotFound::new);
         try {
             ChatRoomJoin chatRoomJoin1 = chatRoomJoinRepository.findByCustomerAndChatRoom(customer, chatRoom).get();
