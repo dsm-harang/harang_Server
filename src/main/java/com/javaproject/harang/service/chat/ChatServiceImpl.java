@@ -96,7 +96,6 @@ public class ChatServiceImpl implements ChatService {
             int cnt = 0;
             for (ChatRoomJoin join : list) {
                 if (join.getCustomer().getName().equals(customer.getName())) {
-                    form.setReceiver(join.getCustomer().getName());
                     ++cnt;
                 }
             }

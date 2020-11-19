@@ -52,6 +52,7 @@ public class MyPageServiceImpl implements MypageService {
 
         Map<String, Object> map = new HashMap<>();
 
+        map.put("user_id",user.getId());
         map.put("Intro", user.getIntro());
         map.put("name", user.getName());
         map.put("imagePath", user.getImagePath());
@@ -67,6 +68,7 @@ public class MyPageServiceImpl implements MypageService {
                 .orElseThrow(UserNotFound::new);
 
         map.put("Intro", customer.getIntro());
+        map.put("user_id",customer.getId());
         map.put("name", customer.getName());
         map.put("imagePath", customer.getImagePath());
 
@@ -95,6 +97,7 @@ public class MyPageServiceImpl implements MypageService {
         File file = new File(imagePath, fileName);
         myPageUpdateRequest.getImagePath().transferTo(file);
 
+        map.put("user_id",user.getId());
         map.put("name", user.getName());
         map.put("Intro", user.getIntro());
         map.put("imagePath", user.getImagePath());
