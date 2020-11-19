@@ -349,7 +349,7 @@ public class PostServiceImpl implements PostService {
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-        Post post = postRepository.findByUserId(postId)
+        Post post = postRepository.findByUserId(user.getId())
                 .orElseThrow(PostNotFound::new);
 
         if (!user.getId().equals(post.getUserId())) throw new RuntimeException();
