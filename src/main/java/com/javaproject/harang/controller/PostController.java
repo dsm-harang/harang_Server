@@ -25,6 +25,7 @@ public class PostController {
                           @RequestParam String content,
                           @RequestParam String tag,
                           @RequestParam Integer ageLimit,
+                          @RequestParam LocalDateTime meetTime,
                           @RequestParam String address,
                           @RequestParam Integer personnel,
                           @RequestParam MultipartFile image) {
@@ -34,7 +35,7 @@ public class PostController {
                     .title(title)
                     .content(content)
                     .tag(tag)
-                    .meetTime(LocalDateTime.now())
+                    .meetTime(meetTime)
                     .ageLimit(ageLimit)
                     .address(address)
                     .personnel(personnel)

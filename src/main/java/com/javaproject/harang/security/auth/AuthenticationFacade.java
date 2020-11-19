@@ -24,13 +24,16 @@ public class AuthenticationFacade {
 
 
     public Integer getReceiptCode() {
-        Authentication auth = this.getAuthentication();
-        if (auth.getPrincipal() instanceof AuthDetails) {
-            return ((AuthDetails) auth.getPrincipal()).getUser().getId();
-        } else {
-            return Integer.parseInt(this.getAuthentication().getName());
+        try {
+            Authentication auth = this.getAuthentication();
+            if (auth.getPrincipal() instanceof AuthDetails) {
+                return ((AuthDetails) auth.getPrincipal()).getUser().getId();
+            } else {
+                return Integer.parseInt(this.getAuthentication().getName());
+            }
+        } catch (NumberFormatException e) {
+            throw new TokenNotFound();
         }
-
 
     }
 }

@@ -85,12 +85,12 @@ public class ChatRoomJoinService {
                 if (customer.equals(chatRoomJoin1.getCustomer())) {
                     throw new UserNotFound();
                 } else {
-                    notifyService.addChatNotice(userId);
+                    notifyService.addChatNotice(chatRoom.getPostId(),userId);
                     createRoom(userId, chatRoom);
                 }
             } else throw new UserNotFound();
         } catch (NoSuchElementException e) {
-            notifyService.addChatNotice(userId);
+            notifyService.addChatNotice(chatRoom.getPostId(),userId);
             createRoom(userId, chatRoom);
         } catch (RuntimeException e) {
             throw new UserNotFound();

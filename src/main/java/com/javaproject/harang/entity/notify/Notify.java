@@ -24,11 +24,13 @@ public class Notify {
 
     private String content;
 
+    private Integer postId;
+
     private LocalDateTime createdAt;
 
-    private String name;
+//    private String name;
 
-    private NotifyType Type;
+    private NotifyType type;
 
 }
 

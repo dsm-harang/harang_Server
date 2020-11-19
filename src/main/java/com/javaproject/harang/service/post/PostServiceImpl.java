@@ -21,6 +21,7 @@ import com.javaproject.harang.payload.response.AcceptListResponse;
 import com.javaproject.harang.payload.response.GetPostResponse;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
+import com.javaproject.harang.service.notice.NotifyServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +49,7 @@ public class PostServiceImpl implements PostService {
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
     private final ScoreRepository scoreRepository;
-
+    private final NotifyServiceImpl notifyService;
     private final AuthenticationFacade authenticationFacade;
 
     @SneakyThrows
@@ -193,8 +194,8 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = (List<Post>) postRepository.findAll();
 
         for (Post post : posts) {
-            Score score = scoreRepository.findByUserId(post.getUserId())
-                    .orElseThrow(RuntimeException::new);
+//            Score score = scoreRepository.findByUserId(post.getUserId())
+//                    .orElseThrow(RuntimeException::new);
 
             Customer customer = customerRepository.findById(post.getUserId())
                     .orElseThrow(UserNotFound::new);
@@ -202,10 +203,14 @@ public class PostServiceImpl implements PostService {
             File file = new File(customer.getImagePath());
             File fileName = new File(post.getImage());
 
+            if(post.getMeetTime().isBefore(LocalDateTime.now())){
+                notifyService.addScoreNotice(post.getId());
+            }
+
             list.add(
                     PostListResponse.builder()
                             .postId(post.getId())
-                            .score(score.getScore())
+                            .score(1)
                             .userId(post.getUserId())
                             .title(post.getTitle())
                             .content(post.getContent())
@@ -239,7 +244,6 @@ public class PostServiceImpl implements PostService {
         User username = customerRepository.findById(application.getUserId()).orElseThrow();
 
         application.accept();
-
         memberRepository.save(
                 Member.builder()
                         .postId(posts.getId())
@@ -273,6 +277,8 @@ public class PostServiceImpl implements PostService {
                 .ifPresent(member -> {
                     throw new MemberAlreadyIncludeException();
                 });
+
+        notifyService.addPostNotice(postId,user.getId());
 
         applicationRepository.save(
                 Application.builder()

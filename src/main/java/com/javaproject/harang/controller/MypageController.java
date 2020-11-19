@@ -47,11 +47,11 @@ public class MypageController {
     }
 
     @PostMapping("/score")
-    public Map<String, Object> SendScore(@RequestParam Integer score,
+    public void SendScore(@RequestParam Integer score,
                                          @RequestParam Integer postId,
                                          @RequestParam String scoreContent,
                                          @RequestParam Integer scoreTargetId) {
-        return mypageService.SendScore(postId, score, scoreContent, scoreTargetId);
+       mypageService.SendScore(postId, score, scoreContent, scoreTargetId);
     }
 
     @GetMapping("/scoreList/{postId}")

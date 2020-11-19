@@ -55,7 +55,7 @@ public class ChatServiceImpl implements ChatService {
     public void closeChat(Integer chatRoomId) {
         ChatRoom chatRoom = chatRoomService.findById(chatRoomId).orElseThrow();
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        Customer customer = customerRepository.findById(receiptCode).orElseThrow();
+        Customer customer = customerRepository.findById(receiptCode).get();
         System.out.println(customer.getId());
         ChatRoomJoin chatRoomJoin = chatRoomJoinRepository.findByCustomerAndChatRoom(customer, chatRoom).orElseThrow(ChatRoomJoinNotFound::new);
         Member member = memberRepository.findByUserIdAndPostId(customer.getId(),chatRoomId).orElseThrow(UserNotFound::new);

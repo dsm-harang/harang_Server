@@ -38,10 +38,7 @@ public class MyPageServiceImpl implements MypageService {
     private final AuthenticationFacade authenticationFacade;
     private final ScoreRepository scoreRepository;
     private final MemberRepository memberRepository;
-    private final NotifyRepository notifyRepository;
-    private final NotifyService notifyService;
-    private final NotifyServiceImpl notifyServiceImpl;
-    private final PostRepository postRepository;
+
 
     @Value("${image.file.path}")
     private String imagePath;
@@ -115,7 +112,7 @@ public class MyPageServiceImpl implements MypageService {
     }
 
     @Override
-    public Map<String, Object> SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId) {
+    public void SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId) {
         Map<String, Object> map = new HashMap<>();
 
         Integer receiptCode = authenticationFacade.getReceiptCode();
@@ -157,9 +154,6 @@ public class MyPageServiceImpl implements MypageService {
         }catch (RuntimeException e) {
             throw new ScoreNotFound();
         }
-        map.put("message", "success");
-
-        return map;
     }
 
     @Override

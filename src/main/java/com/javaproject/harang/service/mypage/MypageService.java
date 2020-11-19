@@ -18,7 +18,7 @@ public interface MypageService {
 
     ScoreResponse GetScore(Integer Id);
 
-    Map<String, Object> SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId);
+    void SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId);
 
     ListScoreResponse ListScore(Integer postId);
 

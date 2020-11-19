@@ -1,4 +1,4 @@
-package com.javaproject.harang.payload.response.chatresponse;
+package com.javaproject.harang.payload.response.chatResponse;
 
 import lombok.Getter;
 import lombok.Setter;
