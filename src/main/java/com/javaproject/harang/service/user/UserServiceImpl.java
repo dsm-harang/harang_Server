@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService{
                         .age(signUpRequest.getAge())
                         .phoneNumber(signUpRequest.getPhoneNumber())
                         .intro(signUpRequest.getIntro())
-                        .imagePath(imagePath + fileName)
+                        .imagePath(imagePath + "/" +fileName)
                         .build()
         );
 

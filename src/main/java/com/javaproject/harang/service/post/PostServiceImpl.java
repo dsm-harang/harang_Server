@@ -75,7 +75,7 @@ public class PostServiceImpl implements PostService {
                         .address(postWriteRequest.getAddress())
                         .ageLimit(postWriteRequest.getAgeLimit())
                         .personnel(postWriteRequest.getPersonnel())
-                        .image(postWriteRequest.getImage() + fileName)
+                        .image(imagePath+ "/" +fileName)
                         .writer(user.getName())
                         .build()
         );
