@@ -11,7 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ChatMessageForm {
     private Integer ChatRoomId;
-    private String receiver;
     private String sender;
     private String message;
 }

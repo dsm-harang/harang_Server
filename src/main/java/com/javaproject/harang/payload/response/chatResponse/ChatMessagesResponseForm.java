@@ -5,27 +5,17 @@ import com.javaproject.harang.entity.chat.ChatMessage;
 import java.util.List;
 
 public class ChatMessagesResponseForm {
-    private String receiver;
     private String userName;
     private int userId;
     private int chatRoomId;
     private List<ChatMessage> messages;
 
     public ChatMessagesResponseForm() {}
-    public ChatMessagesResponseForm(String receiver, String userName, int userId, int chatRoomId, List<ChatMessage> messages) {
-        this.receiver = receiver;
+    public ChatMessagesResponseForm( String userName, int userId, int chatRoomId, List<ChatMessage> messages) {
         this.userName = userName;
         this.userId = userId;
         this.chatRoomId = chatRoomId;
         this.messages = messages;
-    }
-
-    public String getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
     }
 
     public String getUserName() {
