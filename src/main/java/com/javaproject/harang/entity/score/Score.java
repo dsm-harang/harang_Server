@@ -18,8 +18,7 @@ public class Score {
     private Integer id;
 
     private Integer userId;
-    
-    @Column(columnDefinition = "int default 0")
+
     private Integer score;
 
     private LocalDateTime scoreAt;

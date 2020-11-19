@@ -113,11 +113,11 @@ public class MyPageServiceImpl implements MypageService {
 
     @Override
     public void SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId) {
-        Map<String, Object> map = new HashMap<>();
 
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
+        memberRepository.findByUserIdAndPostId(scoreTargetId,postId).orElseThrow(MemberNotFound::new);
         Member member = memberRepository.findByUserIdAndPostId(user.getId(), postId).orElseThrow(MemberNotFound::new);
         try {
             Score scores = scoreRepository.findByUserIdAndScoreTargetId(user.getId(), scoreTargetId).orElseThrow();
