@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -19,6 +20,6 @@ public class PostListResponse {
     private LocalDateTime createdAt;
     private Integer personnel;
     private String postImage;
-    private Integer score;
+    private int score;
     private String profileImage;
 }

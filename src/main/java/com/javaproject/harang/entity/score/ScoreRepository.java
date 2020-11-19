@@ -12,7 +12,8 @@ import java.util.Optional;
 public interface ScoreRepository extends CrudRepository<Score, Integer> {
 
     @Query("SELECT c FROM Score c WHERE c.userId=:userId")
-    List<Score> findAllByUserId(Integer userId);
+    List<Score> findAllByScoreTargetId(Integer targetId);
+    Integer countAllByScoreTargetId(Integer targetId);
 
     Optional<Score> findByUserId(Integer userId);
 
