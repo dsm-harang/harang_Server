@@ -21,32 +21,32 @@ public class AdminController {
         adminService.userDelete(targetId);
     }
 
-    @DeleteMapping("post/{postId}")
+    @DeleteMapping("/post/{postId}")
     public void userPostDelete(@PathVariable Integer postId) {
         adminService.userPostDelete(postId);
     }
 
-    @DeleteMapping("report/user/{targetId}")
+    @DeleteMapping("/report/user/{targetId}")
     private void userReportDelete(@PathVariable Integer targetId) {
         adminService.userReportDelete(targetId);
     }
 
-    @DeleteMapping("report/post/{postId}")
+    @DeleteMapping("/report/post/{postId}")
     private void postReportDelete(@PathVariable Integer postId) {
         adminService.postReportDelete(postId);
     }
 
-    @DeleteMapping("score/{userId}")
+    @DeleteMapping("/score/{userId}")
     private void score(@PathVariable Integer userId) {
         adminService.score(userId);
     }
 
-    @GetMapping("post")
+    @GetMapping("/post")
     public List<PostReportResponse> postReport() {
         return adminService.postReport();
     }
 
-    @GetMapping("user")
+    @GetMapping("/user")
     public List<UserReportResponse> userReport() {
         return adminService.userReport();
     }
