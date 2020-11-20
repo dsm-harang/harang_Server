@@ -1,12 +1,14 @@
 package com.javaproject.harang.entity.Post;
 
+import com.javaproject.harang.entity.score.Score;
+import com.javaproject.harang.entity.user.User;
+import com.javaproject.harang.entity.user.customer.Customer;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,7 +22,13 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer userId;
+    @ManyToOne(targetEntity = Customer.class)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Integer getUserId() {
+        return user.getId();
+    }
 
     private LocalDateTime createdAt;
 

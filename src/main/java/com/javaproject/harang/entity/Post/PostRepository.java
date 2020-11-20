@@ -1,5 +1,6 @@
 package com.javaproject.harang.entity.Post;
 
+import com.javaproject.harang.entity.user.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,5 +11,5 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends CrudRepository<Post, Integer> {
     List<Post> findByTagContainsOrTitleContains(String tag, String title);
-    Optional<Post> findByUserId (Integer userId);
+    Optional<Post> findByUser(User user);
 }
