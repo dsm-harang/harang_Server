@@ -3,8 +3,7 @@ package com.javaproject.harang.controller;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
-import com.javaproject.harang.payload.response.NotifyResponse;
-import com.javaproject.harang.payload.response.MySeePageResponse;
+import com.javaproject.harang.payload.response.MyPostListResponse;
 import com.javaproject.harang.payload.response.ScoreResponse;
 import com.javaproject.harang.service.mypage.MypageService;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +31,9 @@ public class MypageController {
     }
 
     @PutMapping()
-    public Map<String, Object> UpdateMyPage(@RequestParam String intro,
-                                            @RequestParam MultipartFile image) {
-        return mypageService.UpdateMyPage(
+    public void UpdateMyPage(@RequestParam String intro,
+                             @RequestParam MultipartFile image) {
+        mypageService.updateMyPage(
                 MyPageUpdateRequest.builder()
                         .intro(intro)
                         .imagePath(image)
@@ -43,7 +42,7 @@ public class MypageController {
     }
 
     @GetMapping("/score/{userId}")
-    public List<ScoreResponse> getScore(@PathVariable Integer id) {
+    public List<ScoreResponse> getTargetScore(@PathVariable Integer id) {
         return mypageService.getScore(id);
     }
 
@@ -63,8 +62,8 @@ public class MypageController {
     }
 
     @GetMapping("/post")
-    public MySeePageResponse MyPost() {
-        return mypageService.MyPost();
+    public List<MyPostListResponse> myPost() {
+        return mypageService.myPost();
     }
 
 
