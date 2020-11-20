@@ -19,9 +19,4 @@ public class AdminEncoderController {
         return passwordEncoder.encode(password);
     }
 
-    @GetMapping()
-    public String cheerUp() {
-        return "자프 많이 힘들겠지만 조금만 더 힘내자~!!";
-    }
-
 }
