@@ -77,6 +77,7 @@ public class UserServiceImpl implements UserService{
                         .targetUserId(target.getUserId())
                         .targetName(target.getName())
                         .content(content)
+                        .score(user.getAverageScore())
                         .reportTime(LocalDate.now())
                         .build()
         );

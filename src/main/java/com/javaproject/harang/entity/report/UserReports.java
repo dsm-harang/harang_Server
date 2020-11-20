@@ -29,7 +29,7 @@ public class UserReports {
 
     private Integer targetId;
 
-    private Integer score;
+    private double score;
 
     private LocalDate reportTime;
 }
