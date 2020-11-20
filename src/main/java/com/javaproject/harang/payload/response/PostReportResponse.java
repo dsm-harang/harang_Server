@@ -12,5 +12,6 @@ public class PostReportResponse {
     private Integer postId;
     private String title;
     private String writer;
+    private double score;
     private LocalDate reportTime;
 }
