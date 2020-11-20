@@ -36,7 +36,7 @@ public class ChatRoomController {
     }
 
     @RequestMapping("/chat/{chatRoomId}")
-    public ChatMessagesResponseForm goChat(@PathVariable("chatRoomId") Integer chatRoomId) {
+    public List<ChatMessagesResponseForm> goChat(@PathVariable("chatRoomId") Integer chatRoomId) {
         return chatService.goChat(chatRoomId);
     }
 }

@@ -3,23 +3,24 @@ package com.javaproject.harang.service.chat;
 import com.javaproject.harang.entity.chat.*;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
+import com.javaproject.harang.entity.score.Score;
+import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.exception.ChatRoomJoinNotFound;
 import com.javaproject.harang.exception.ChatRoomNotFound;
 import com.javaproject.harang.exception.NotEqualsUser;
 import com.javaproject.harang.exception.UserNotFound;
+import com.javaproject.harang.payload.response.ScoreResponse;
 import com.javaproject.harang.payload.response.chatResponse.ChatMessagesResponseForm;
 import com.javaproject.harang.payload.response.chatResponse.ChatRoomForm;
+import com.javaproject.harang.payload.response.chatResponse.ChatUserForm;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -32,6 +33,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRoomJoinRepository chatRoomJoinRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     @Override
     public Map<String, Object> chatHome() {
@@ -59,7 +61,7 @@ public class ChatServiceImpl implements ChatService {
         Customer customer = customerRepository.findById(receiptCode).get();
         System.out.println(customer.getId());
         ChatRoomJoin chatRoomJoin = chatRoomJoinRepository.findByCustomerAndChatRoom(customer, chatRoom).orElseThrow(ChatRoomJoinNotFound::new);
-        Member member = memberRepository.findByUserIdAndPostId(customer.getId(),chatRoomId).orElseThrow(UserNotFound::new);
+        Member member = memberRepository.findByUserIdAndPostId(customer.getId(), chatRoomId).orElseThrow(UserNotFound::new);
         if (customer.equals(chatRoomJoin.getCustomer())) {
             chatRoom.setStatus("close");
             chatRoomRepository.save(chatRoom);
@@ -67,44 +69,33 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public ChatMessagesResponseForm goChat(Integer chatRoomId) {
-
-        ChatMessagesResponseForm form = new ChatMessagesResponseForm();
+    public List<ChatMessagesResponseForm> goChat(Integer chatRoomId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         Customer customer = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(ChatRoomNotFound::new);
-        List<ChatMessage> messages = chatRoom.getMessages();
-        ChatRoomJoin chatRoomJoin = chatRoomJoinRepository.findByCustomerAndChatRoom(customer, chatRoom)
-                .orElseThrow(ChatRoomJoinNotFound::new);
-        if (customer.equals(chatRoomJoin.getCustomer())) {
-            Collections.sort(messages, (t1, t2) -> {
-                if (t1.getId() > t2.getId()) return -1;
-                else return 1;
-            });
-            if (customer == null) {
-                form.setUserName("");
-                form.setUserId(0);
-            } else {
-                form.setUserName(customer.getName());
-                form.setUserId(customer.getId());
-            }
-            List<ChatRoomJoin> list = chatRoomJoinService.findByChatRoom(chatRoom);
-            form.setMessages(messages);
-            form.setChatRoomId(chatRoom.getId());
-            int cnt = 0;
-            for (ChatRoomJoin join : list) {
-                if (join.getCustomer().getName().equals(customer.getName())) {
-                    ++cnt;
-                }
-            }
-            if (cnt == 0) {
-                throw new UserNotFound();
-            }
-        } else {
-            throw new NotEqualsUser();
+        List<ChatUserForm> userForms = new ArrayList<>();
+        List<ChatMessagesResponseForm> messages = new ArrayList<>();
+
+        for (ChatMessage chatMessage : chatMessageRepository.findAllByChatRoom(chatRoom)) {
+            userForms.add(
+                    ChatUserForm.builder()
+                            .name(chatMessage.getWriter().getName())
+                            .imagePath(chatMessage.getWriter().getImagePath())
+                            .userId(chatMessage.getWriter().getId())
+                            .message(chatMessage.getMessage())
+
+                            .build()
+            );
         }
-        return form;
+        messages.add(
+                ChatMessagesResponseForm.builder()
+                        .chatRoomId(chatRoom.getId())
+                        .userName(customer.getName())
+                        .userId(customer.getId())
+                        .message(userForms)
+                        .build());
+        return messages;
     }
 }
