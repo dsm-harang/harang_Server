@@ -22,4 +22,6 @@ public class ImageController {
     public byte[] getImage(@PathVariable String imageName) {
         return imageService.getImage(imageName);
     }
+
+
 }

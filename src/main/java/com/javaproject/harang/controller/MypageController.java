@@ -41,9 +41,9 @@ public class MypageController {
         );
     }
 
-    @GetMapping("/score/{Id}")
-    public ScoreResponse GetScore(@PathVariable("Id") Integer Id) {
-        return mypageService.GetScore(Id);
+    @GetMapping("/score/{id}")
+    public List<ScoreResponse> getScore(@PathVariable Integer id) {
+        return mypageService.getScore(id);
     }
 
     @PostMapping("/score")

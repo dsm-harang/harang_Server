@@ -20,6 +20,31 @@ public class PostController {
 
     private final PostService postService;
 
+    @GetMapping("/{postId}")
+    public GetPostResponse getPost(@PathVariable Integer postId){
+        return postService.getPost(postId);
+    }
+
+    @GetMapping
+    public List<PostListResponse> getPostList()   {
+        return postService.getPostList();
+    }
+
+    @GetMapping("/accept/{applicationId}")
+    public void accept(@PathVariable Integer applicationId){
+        postService.accept(applicationId);
+    }
+
+    @GetMapping("/tag")
+    public List<PostListResponse> searchTag(@RequestParam String tag) {
+        return postService.searchTag(tag);
+    }
+
+    @GetMapping("/accept/list/{postId}")
+    public List<AcceptListResponse> acceptPostList(@PathVariable Integer postId){
+        return postService.acceptPostList(postId);
+    }
+
     @PostMapping()
     public void PostWrite(@RequestParam String title,
                           @RequestParam String content,
@@ -42,6 +67,16 @@ public class PostController {
                     .image(image)
                     .build()
         );
+    }
+
+    @PostMapping("/{postId}")
+    private void sendPost(@PathVariable Integer postId){
+        postService.sendPost(postId);
+    }
+
+    @PostMapping("/report/{postId}")
+    private void report(@PathVariable Integer postId){
+        postService.report(postId);
     }
 
     @PutMapping("/{postId}")
@@ -74,39 +109,4 @@ public class PostController {
         postService.postDelete(postId);
     }
 
-    @GetMapping("/{postId}")
-    public GetPostResponse getPost(@PathVariable Integer postId){
-        return postService.getPost(postId);
-    }
-
-    @GetMapping
-    public List<PostListResponse> getPostList()   {
-        return postService.getPostList();
-    }
-
-    @GetMapping("/accept/{applicationId}")
-    public void accept(@PathVariable Integer applicationId){
-        postService.accept(applicationId);
-    }
-
-    @PostMapping("/{postId}")
-    private void sendPost(@PathVariable Integer postId){
-        postService.sendPost(postId);
-    }
-
-    @PostMapping("/report/{postId}")
-    private void report(@PathVariable Integer postId,
-                        @RequestParam String content){
-        postService.report(postId, content);
-    }
-
-    @GetMapping("/tag")
-    public List<PostListResponse> searchTag(@RequestParam String tag) {
-        return postService.searchTag(tag);
-    }
-
-    @GetMapping("/accept/list/{postId}")
-    public List<AcceptListResponse> acceptPostList(@PathVariable Integer postId){
-        return postService.acceptPostList(postId);
-    }
 }
