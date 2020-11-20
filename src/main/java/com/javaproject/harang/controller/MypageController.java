@@ -1,6 +1,7 @@
 package com.javaproject.harang.controller;
 
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
+import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
 import com.javaproject.harang.payload.response.NotifyResponse;
 import com.javaproject.harang.payload.response.MySeePageResponse;
@@ -41,17 +42,19 @@ public class MypageController {
         );
     }
 
-    @GetMapping("/score/{id}")
+    @GetMapping("/score/{userId}")
     public List<ScoreResponse> getScore(@PathVariable Integer id) {
         return mypageService.getScore(id);
     }
 
-    @PostMapping("/score")
-    public void SendScore(@RequestParam Integer score,
-                                         @RequestParam Integer postId,
-                                         @RequestParam String scoreContent,
-                                         @RequestParam Integer scoreTargetId) {
-       mypageService.SendScore(postId, score, scoreContent, scoreTargetId);
+    @GetMapping("/score")
+    public List<ScoreResponse> getScore() {
+        return mypageService.getScore();
+    }
+
+    @PostMapping("/score/{targetId}")
+    public void SendScore(@PathVariable Integer targetId, @RequestBody SendScoreRequest sendScoreRequest) {
+       mypageService.SendScore(targetId, sendScoreRequest);
     }
 
     @GetMapping("/scoreList/{postId}")
