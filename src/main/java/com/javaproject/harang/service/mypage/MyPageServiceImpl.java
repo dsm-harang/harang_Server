@@ -1,5 +1,7 @@
 package com.javaproject.harang.service.mypage;
 
+import com.javaproject.harang.entity.Post.Post;
+import com.javaproject.harang.entity.Post.PostRepository;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
 import com.javaproject.harang.entity.score.Score;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,9 +32,11 @@ import java.util.stream.Collectors;
 public class MyPageServiceImpl implements MypageService {
 
     private final CustomerRepository customerRepository;
-    private final AuthenticationFacade authenticationFacade;
     private final ScoreRepository scoreRepository;
     private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
+
+    private final AuthenticationFacade authenticationFacade;
 
 
     @Value("${image.file.path}")
@@ -71,32 +76,27 @@ public class MyPageServiceImpl implements MypageService {
 
     @SneakyThrows
     @Override
-    public Map<String, Object> UpdateMyPage(MyPageUpdateRequest myPageUpdateRequest) {
+    public void updateMyPage(MyPageUpdateRequest myPageUpdateRequest) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        User user = customerRepository.findById(receiptCode)
+        Customer user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-        Map<String, Object> map = new HashMap<>();
-        String fileName = UUID.randomUUID().toString();
+        if (myPageUpdateRequest.getImagePath() != null) {
 
-        Customer customer = customerRepository.findById(user.getId())
-                .orElseThrow(UserNotFound::new);
+            String fileName = UUID.randomUUID().toString();
 
-        File deleteFile = new File(user.getImagePath());
-        deleteFile.delete();
-        customer.setIntro(customer.getIntro());
-        customer.setImagePath(imagePath + fileName);
-        customerRepository.save(customer);
+            File file = new File(imagePath, user.getImagePath());
+            if (file.exists()) file.delete();
 
-        File file = new File(imagePath, fileName);
-        myPageUpdateRequest.getImagePath().transferTo(file);
+            customerRepository.save(user.updateFileName(imagePath + fileName));
 
-        map.put("user_id",user.getId());
-        map.put("name", user.getName());
-        map.put("Intro", user.getIntro());
-        map.put("imagePath", user.getImagePath());
+            myPageUpdateRequest.getImagePath().transferTo(new File(imagePath, fileName));
+        }
 
-        return map;
+        setIfNotNull(user::setIntro, myPageUpdateRequest.getIntro());
+
+        customerRepository.save(user);
+
     }
 
     @Override
@@ -181,13 +181,31 @@ public class MyPageServiceImpl implements MypageService {
     
 
     @Override
-    public MySeePageResponse MyPost() {
+    public List<MyPostListResponse> myPost() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
-        List<MyPostResponse> member = memberRepository.findALLByuserId(user.getId());
-        return new MySeePageResponse(member);
+
+        List<Post> postList = postRepository.findAllByUser(user);
+
+        List<MyPostListResponse> myPostList = new ArrayList<>();
+        for (Post post : postList) {
+            myPostList.add(
+                    MyPostListResponse.builder()
+                        .postId(post.getId())
+                        .postTitle(post.getTitle())
+                        .build()
+            );
+        }
+
+        return myPostList;
     }
 
+
+    private <T> void setIfNotNull(Consumer<T> setter, T value) {
+        if (value != null) {
+            setter.accept(value);
+        }
+    }
 
 }
