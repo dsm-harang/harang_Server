@@ -13,4 +13,5 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
     List<Post> findByTagContainsOrTitleContains(String tag, String title);
     Optional<Post> findByUser(User user);
     List<Post> findAllByUserNot(User user);
+    List<Post> findAllByUser(User user);
 }

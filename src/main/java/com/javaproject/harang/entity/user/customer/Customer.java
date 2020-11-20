@@ -52,6 +52,12 @@ public class Customer implements User {
         return AuthorityType.USER;
     }
 
+    public Customer updateFileName(String fileName) {
+        this.imagePath = fileName;
+
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
