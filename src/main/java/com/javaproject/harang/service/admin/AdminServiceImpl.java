@@ -141,6 +141,9 @@ public class AdminServiceImpl implements AdminService{
             Post post = postRepository.findById(report.getPostId())
                     .orElseThrow(UserNotFound::new);
 
+            User target = customerRepository.findById(report.getUserId())
+                    .orElseThrow(UserNotFound::new);
+
             list.add(
                 PostReportResponse.builder()
                         .id(report.getId())
@@ -148,6 +151,7 @@ public class AdminServiceImpl implements AdminService{
                         .reportTime(LocalDate.now())
                         .title(post.getTitle())
                         .writer(post.getWriter())
+                        .score(target.getAverageScore())
                         .build()
             );
         }
