@@ -66,7 +66,7 @@ public class PostServiceImpl implements PostService {
 
         Post post = postRepository.save(
                 Post.builder()
-                        .userId(user.getId())
+                        .user(user)
                         .title(postWriteRequest.getTitle())
                         .content(postWriteRequest.getContent())
                         .createdAt(LocalDateTime.now())
@@ -172,11 +172,12 @@ public class PostServiceImpl implements PostService {
 
         boolean isMine;
 
-        if (user.getUserId().equals(post.getUserId())) {
+        if (user.getId().equals(post.getUserId())) {
             isMine = true;
         } else
             isMine = false;
 
+        File file = new File(post.getImage());
         return GetPostResponse.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
@@ -186,6 +187,7 @@ public class PostServiceImpl implements PostService {
                 .meetTime(post.getMeetTime())
                 .personnel(post.getPersonnel())
                 .address(post.getAddress())
+                .image(file.getName())
                 .isMine(isMine)
                 .build();
     }
@@ -197,16 +199,6 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = (List<Post>) postRepository.findAll();
 
         for (Post post : posts) {
-            List<Score> score = scoreRepository.findAllByScoreTargetId(post.getUserId());
-            Integer scoreCount = scoreRepository.countAllByScoreTargetId(post.getUserId());
-
-            int sum = 0;
-            int totalScore;
-            for(Score score1 : score) {
-                sum =+ score1.getScore();
-            }
-            totalScore = sum/scoreCount;
-
             Customer customer = customerRepository.findById(post.getUserId())
                     .orElseThrow(UserNotFound::new);
 
@@ -220,7 +212,7 @@ public class PostServiceImpl implements PostService {
             list.add(
                     PostListResponse.builder()
                             .postId(post.getId())
-                            .score(totalScore)
+                            .score(post.getUser().getAverageScore())
                             .userId(post.getUserId())
                             .title(post.getTitle())
                             .content(post.getContent())
@@ -302,7 +294,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void report(Integer postId, String content) {
+    public void report(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
@@ -349,7 +341,7 @@ public class PostServiceImpl implements PostService {
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-        Post post = postRepository.findByUserId(user.getId())
+        Post post = postRepository.findByUser(user)
                 .orElseThrow(PostNotFound::new);
 
         if (!user.getId().equals(post.getUserId())) throw new RuntimeException();

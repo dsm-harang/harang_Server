@@ -16,7 +16,7 @@ public interface PostService {
     List<PostListResponse> getPostList();
     void accept(Integer applicationId);
     void sendPost(Integer postId);
-    void report(Integer postId, String content);
+    void report(Integer postId);
     List<PostListResponse> searchTag(String tag);
     List<AcceptListResponse> acceptPostList(Integer postId);
 }
