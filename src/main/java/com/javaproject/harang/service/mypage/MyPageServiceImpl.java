@@ -1,11 +1,7 @@
 package com.javaproject.harang.service.mypage;
 
-import com.javaproject.harang.entity.Post.Post;
-import com.javaproject.harang.entity.Post.PostRepository;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
-import com.javaproject.harang.entity.notify.Notify;
-import com.javaproject.harang.entity.notify.NotifyRepository;
 import com.javaproject.harang.entity.score.Score;
 import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
@@ -17,11 +13,8 @@ import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.response.*;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
-import com.javaproject.harang.service.notice.NotifyService;
-import com.javaproject.harang.service.notice.NotifyServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -106,22 +99,39 @@ public class MyPageServiceImpl implements MypageService {
     }
 
     @Override
-    public ScoreResponse GetScore(Integer Id) {
-        Customer user = customerRepository.findById(Id).orElseThrow(UserNotFound::new);
+    public List<ScoreResponse> getScore(Integer id) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        User user = customerRepository.findById(receiptCode)
+                .orElseThrow(UserNotFound::new);
 
-        List<Score> scores = scoreRepository.findByScoreTargetId(user.getId());
+        List<ScoreResponse> scoreResponses = new ArrayList<>();
+        for (Score score : scoreRepository.findAllByScoreTargetId(user.getId())) {
+            User target = customerRepository.findById(score.getUserId())
+                    .orElseThrow(UserNotFound::new);
 
-        return new ScoreResponse(scores);
+            scoreResponses.add(
+                    ScoreResponse.builder()
+                        .score(user.getAverageScore())
+                        .scoreAt(score.getScoreAt())
+                        .comment(score.getScoreComment())
+                        .senderName(target.getName())
+                        .build()
+            );
+        }
+
+        return scoreResponses;
     }
 
     @Override
     public void SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId) {
-
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
+
         memberRepository.findByUserIdAndPostId(scoreTargetId,postId).orElseThrow(MemberNotFound::new);
+
         Member member = memberRepository.findByUserIdAndPostId(user.getId(), postId).orElseThrow(MemberNotFound::new);
+
         try {
             Score scores = scoreRepository.findByUserIdAndScoreTargetId(user.getId(), scoreTargetId).orElseThrow();
             if (scores.getScoreTargetId().equals(scoreTargetId)) {
@@ -164,6 +174,7 @@ public class MyPageServiceImpl implements MypageService {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
+
         List<Member> members = memberRepository.findALLByPostId(postId);
         List<Member> collect = members.stream()
                 .filter(m -> !m.getUserId().equals(user.getId()))
