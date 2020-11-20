@@ -85,9 +85,7 @@ public class ChatServiceImpl implements ChatService {
                             .imagePath(chatMessage.getWriter().getImagePath())
                             .userId(chatMessage.getWriter().getId())
                             .message(chatMessage.getMessage())
-
-                            .build()
-            );
+                            .build());
         }
         messages.add(
                 ChatMessagesResponseForm.builder()
