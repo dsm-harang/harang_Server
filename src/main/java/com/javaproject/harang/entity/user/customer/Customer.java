@@ -1,11 +1,16 @@
 package com.javaproject.harang.entity.user.customer;
 
+import com.javaproject.harang.entity.score.Score;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.security.AuthorityType;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -34,6 +39,14 @@ public class Customer implements User {
     private String imagePath;
 
     private String intro;
+
+    @OneToMany(mappedBy = "scoreTargetId", cascade = CascadeType.ALL)
+    List<Score> scores = new ArrayList<>();
+
+    public double getAverageScore() {
+        return BigDecimal.valueOf(scores.stream().mapToInt(Score::getScore).average().orElse(0))
+                .setScale(1, RoundingMode.HALF_UP).doubleValue();
+    }
 
     public AuthorityType getType() {
         return AuthorityType.USER;

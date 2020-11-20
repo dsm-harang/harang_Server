@@ -12,4 +12,5 @@ public interface User {
     String getImagePath();
     String getIntro();
     AuthorityType getType();
+    double getAverageScore();
 }
