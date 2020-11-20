@@ -7,6 +7,6 @@ import lombok.Getter;
 @Builder
 public class AcceptListResponse {
     private String userName;
-    private Integer score;
+    private double score;
     private String imageName;
 }
