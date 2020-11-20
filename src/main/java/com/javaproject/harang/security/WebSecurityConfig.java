@@ -30,7 +30,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
     protected void configure(HttpSecurity http) throws Exception{
         http
                 .csrf().disable()
-                .cors().and()
                 .formLogin().disable()
                 .authorizeRequests()
                 .antMatchers("/auth").permitAll()
