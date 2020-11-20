@@ -11,6 +11,7 @@ import com.javaproject.harang.exception.MemberNotFound;
 import com.javaproject.harang.exception.ScoreNotFound;
 import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
+import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.*;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
@@ -101,11 +102,14 @@ public class MyPageServiceImpl implements MypageService {
     @Override
     public List<ScoreResponse> getScore(Integer id) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        User user = customerRepository.findById(receiptCode)
+        customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
         List<ScoreResponse> scoreResponses = new ArrayList<>();
-        for (Score score : scoreRepository.findAllByScoreTargetId(user.getId())) {
+        for (Score score : scoreRepository.findAllByScoreTargetId(id)) {
+            User user = customerRepository.findById(id)
+                    .orElseThrow(UserNotFound::new);
+
             User target = customerRepository.findById(score.getUserId())
                     .orElseThrow(UserNotFound::new);
 
@@ -123,50 +127,42 @@ public class MyPageServiceImpl implements MypageService {
     }
 
     @Override
-    public void SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId) {
+    public List<ScoreResponse> getScore() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        User user = customerRepository.findById(receiptCode)
+        User user =customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-        memberRepository.findByUserIdAndPostId(scoreTargetId,postId).orElseThrow(MemberNotFound::new);
-
-        Member member = memberRepository.findByUserIdAndPostId(user.getId(), postId).orElseThrow(MemberNotFound::new);
-
-        try {
-            Score scores = scoreRepository.findByUserIdAndScoreTargetId(user.getId(), scoreTargetId).orElseThrow();
-            if (scores.getScoreTargetId().equals(scoreTargetId)) {
-                scores.setScore(score);
-                scores.setScoreAt(LocalDateTime.now());
-                scores.setScoreComment(scoreContent);
-                scoreRepository.save(scores);
-            } else {
-                if (user.getId().equals(member.getUserId())) {
-                    scoreRepository.save(
-                            Score.builder()
-                                    .score(score)
-                                    .scoreAt(LocalDateTime.now())
-                                    .scoreComment(scoreContent)
-                                    .scoreTargetId(scoreTargetId)
-                                    .userId(user.getId())
-                                    .build()
-                    );
-                }
-            }
-        } catch (NoSuchElementException e) {
-            if (user.getId().equals(member.getUserId())) {
-                scoreRepository.save(
-                        Score.builder()
-                                .score(score)
-                                .scoreAt(LocalDateTime.now())
-                                .scoreComment(scoreContent)
-                                .scoreTargetId(scoreTargetId)
-                                .userId(user.getId())
-                                .build()
-                );
-            }
-        }catch (RuntimeException e) {
-            throw new ScoreNotFound();
+        List<ScoreResponse> scoreResponses = new ArrayList<>();
+        for (Score score : scoreRepository.findAllByUserId(user.getId())) {
+            scoreResponses.add(
+                    ScoreResponse.builder()
+                            .score(user.getAverageScore())
+                            .scoreAt(score.getScoreAt())
+                            .comment(score.getScoreComment())
+                            .senderName(user.getName())
+                            .build()
+            );
         }
+
+        return scoreResponses;
+    }
+
+    @Override
+    public void SendScore(Integer targetId, SendScoreRequest sendScoreRequest) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        customerRepository.findById(receiptCode)
+                .orElseThrow(UserNotFound::new);
+
+        memberRepository.findByUserIdAndPostId(targetId, sendScoreRequest.getPostId())
+                .orElseThrow(UserNotFound::new);
+
+        Score.builder()
+                .score((int) sendScoreRequest.getScore())
+                .scoreAt(LocalDateTime.now())
+                .scoreComment(sendScoreRequest.getScoreContent())
+                .scoreTargetId(targetId)
+                .build();
+
     }
 
     @Override

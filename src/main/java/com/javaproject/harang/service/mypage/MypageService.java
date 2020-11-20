@@ -1,6 +1,7 @@
 package com.javaproject.harang.service.mypage;
 
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
+import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
 import com.javaproject.harang.payload.response.MySeePageResponse;
 import com.javaproject.harang.payload.response.ScoreResponse;
@@ -17,7 +18,9 @@ public interface MypageService {
 
     List<ScoreResponse> getScore(Integer id);
 
-    void SendScore(Integer postId, Integer score, String scoreContent, Integer scoreTargetId);
+    List<ScoreResponse> getScore();
+
+    void SendScore(Integer targetId, SendScoreRequest sendScoreRequest);
 
     ListScoreResponse ListScore(Integer postId);
 
