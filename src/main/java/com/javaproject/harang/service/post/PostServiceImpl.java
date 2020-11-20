@@ -52,7 +52,9 @@ public class PostServiceImpl implements PostService {
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
     private final ScoreRepository scoreRepository;
+
     private final NotifyServiceImpl notifyService;
+
     private final AuthenticationFacade authenticationFacade;
 
     @SneakyThrows
@@ -194,11 +196,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostListResponse> getPostList() {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        User user = customerRepository.findById(receiptCode)
+                .orElseThrow(UserNotFound::new);
+
         List<PostListResponse> list = new ArrayList<>();
-
-        List<Post> posts = (List<Post>) postRepository.findAll();
-
-        for (Post post : posts) {
+        for (Post post : postRepository.findAllByUserNot(user)) {
             Customer customer = customerRepository.findById(post.getUserId())
                     .orElseThrow(UserNotFound::new);
 
@@ -317,7 +320,11 @@ public class PostServiceImpl implements PostService {
 
         List<PostListResponse> list = new ArrayList<>();
         for (Post post : posts) {
-            File fileName = new File(post.getImage());
+            User target = customerRepository.findById(post.getUserId())
+                    .orElseThrow(WriterNotFound::new);
+
+            File postName = new File(post.getImage());
+            File proFileName = new File(target.getImagePath());
             list.add(
                     PostListResponse.builder()
                         .title(post.getTitle())
@@ -328,7 +335,10 @@ public class PostServiceImpl implements PostService {
                         .ageLimit(post.getAgeLimit())
                         .createdAt(post.getCreatedAt())
                         .personnel(post.getPersonnel())
-                        .postImage(fileName.getName())
+                        .postImage(postName.getName())
+                        .postId(post.getId())
+                        .userId(target.getId())
+                        .profileImage(proFileName.getName())
                         .build()
             );
         }
@@ -344,24 +354,20 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findByUser(user)
                 .orElseThrow(PostNotFound::new);
 
-        if (!user.getId().equals(post.getUserId())) throw new RuntimeException();
+        if (!user.getId().equals(post.getUserId())) throw new WriterNotFound();
 
         List<Application> applicationList = applicationRepository.findByPostId(postId);
 
         List<AcceptListResponse> acceptList = new ArrayList<>();
         for (Application application : applicationList) {
-
             Customer customer = customerRepository.findById(application.getUserId())
-                    .orElseThrow(UserNotFound::new);
-
-            Score score = scoreRepository.findByUserId(application.getUserId())
                     .orElseThrow(UserNotFound::new);
 
             File file = new File(customer.getImagePath());
             acceptList.add(
                     AcceptListResponse.builder()
                             .userName(customer.getName())
-                            .score(score.getScore())
+                            .score(user.getAverageScore())
                             .imageName(file.getName())
                             .build()
             );
