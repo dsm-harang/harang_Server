@@ -53,4 +53,9 @@ public class Admin implements User {
         return AuthorityType.ADMIN;
     }
 
+    @Override
+    public double getAverageScore() {
+        return 0;
+    }
+
 }
