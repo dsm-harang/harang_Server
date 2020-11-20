@@ -20,6 +20,6 @@ public class PostListResponse {
     private LocalDateTime createdAt;
     private Integer personnel;
     private String postImage;
-    private int score;
+    private double score;
     private String profileImage;
 }

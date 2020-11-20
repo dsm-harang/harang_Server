@@ -1,17 +1,17 @@
 package com.javaproject.harang.payload.response;
 
-import com.javaproject.harang.entity.score.Score;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@AllArgsConstructor
+@Builder
 public class ScoreResponse {
-    private List<Score> scores;
-
-
+    private String senderName;
+    private String comment;
+    private double score;
+    private LocalDateTime scoreAt;
 }

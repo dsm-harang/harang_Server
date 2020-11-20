@@ -16,6 +16,7 @@ public class GetPostResponse {
     private Integer ageLimit;
     private LocalDateTime createdAt;
     private Integer personnel;
+    private String image;
     private boolean isMine;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
