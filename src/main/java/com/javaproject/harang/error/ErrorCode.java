@@ -22,6 +22,7 @@ public enum ErrorCode {
     NOT_EQUALS_USER(404,"Not Equals User"),
     ROOM_CLOSE_EXCEPTION(404,"Room Close Exception"),
     TOKEN_NOT_FOUND(404,"Token Not Found"),
+    ALREADY_TARGET_EXCEPTION(409, "Already Target Exception"),
     APPLICATION_ALREADY_EXCEPTION(409, "Application Already Exception"),
     REPORT_ALREADY_EXCEPTION(409, "Report Already Exception"),
     USER_ALREADY_EXCEPTION(409, "User Already Exception"),
