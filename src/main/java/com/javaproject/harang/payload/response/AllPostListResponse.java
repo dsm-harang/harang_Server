@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MyPostListResponse {
+public class AllPostListResponse {
     private Integer postId;
     private String postTitle;
 }
