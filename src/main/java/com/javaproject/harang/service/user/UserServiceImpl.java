@@ -5,10 +5,7 @@ import com.javaproject.harang.entity.report.repository.UserReportRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
-import com.javaproject.harang.exception.TargetNotFound;
-import com.javaproject.harang.exception.UserAlreadyException;
-import com.javaproject.harang.exception.UserAlreadyReport;
-import com.javaproject.harang.exception.UserNotFound;
+import com.javaproject.harang.exception.*;
 import com.javaproject.harang.payload.request.SignUpRequest;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +60,8 @@ public class UserServiceImpl implements UserService{
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
+
+        if (user.getId().equals(targetId)) throw new AlreadyTargetException();
 
         User target = customerRepository.findById(targetId)
                 .orElseThrow(TargetNotFound::new);
