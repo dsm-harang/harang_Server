@@ -118,16 +118,17 @@ public class AdminServiceImpl implements AdminService{
     }
 
     @Override
-    public void score(Integer userId) {
+    public void score(Integer targetId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
 
-        Score score = scoreRepository.findByUserId(userId)
-                .orElseThrow(UserNotFound::new);
+        List<Score> scoreList = scoreRepository.findByScoreTargetId(targetId);
 
-        score.setScore(0);
-        scoreRepository.save(score);
+        for (Score score : scoreList) {
+            scoreRepository.deleteByScoreTargetId(score.getScoreTargetId());
+            scoreRepository.delete(score);
+        }
     }
 
     @Override
@@ -204,7 +205,7 @@ public class AdminServiceImpl implements AdminService{
         File fileName = new File(customer.getImagePath());
 
         return UserPageResponse.builder()
-                    .score(score.getScore())
+                    .score(customer.getAverageScore())
                     .name(customer.getName())
                     .imageName(fileName.getName())
                     .content(contents)
