@@ -3,7 +3,7 @@ package com.javaproject.harang.controller;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
-import com.javaproject.harang.payload.response.MyPostListResponse;
+import com.javaproject.harang.payload.response.AllPostListResponse;
 import com.javaproject.harang.payload.response.ScoreResponse;
 import com.javaproject.harang.service.mypage.MypageService;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +47,13 @@ public class MypageController {
     }
 
     @GetMapping("/post")
-    public List<MyPostListResponse> myPost() {
+    public List<AllPostListResponse> myPost() {
         return mypageService.myPost();
+    }
+
+    @GetMapping("/post/{targetId}")
+    public List<AllPostListResponse> targetPost(@PathVariable Integer targetId) {
+        return mypageService.targetPost(targetId);
     }
 
     @PostMapping("/score/{targetId}")
