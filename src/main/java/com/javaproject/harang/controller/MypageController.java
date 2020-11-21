@@ -30,30 +30,15 @@ public class MypageController {
         return mypageService.SeeMyPage();
     }
 
-    @PutMapping()
-    public void UpdateMyPage(@RequestParam String intro,
-                             @RequestParam MultipartFile image) {
-        mypageService.updateMyPage(
-                MyPageUpdateRequest.builder()
-                        .intro(intro)
-                        .imagePath(image)
-                        .build()
-        );
-    }
 
-    @GetMapping("/score/{userId}")
-    public List<ScoreResponse> getTargetScore(@PathVariable Integer id) {
-        return mypageService.getScore(id);
+    @GetMapping("/score/{targetId}")
+    public List<ScoreResponse> getTargetScore(@PathVariable Integer targetId) {
+        return mypageService.getTargetScore(targetId);
     }
 
     @GetMapping("/score")
-    public List<ScoreResponse> getScore() {
-        return mypageService.getScore();
-    }
-
-    @PostMapping("/score/{targetId}")
-    public void SendScore(@PathVariable Integer targetId, @RequestBody SendScoreRequest sendScoreRequest) {
-       mypageService.SendScore(targetId, sendScoreRequest);
+    public List<ScoreResponse> getMyScore() {
+        return mypageService.getMyScore();
     }
 
     @GetMapping("/scoreList/{postId}")
@@ -66,7 +51,21 @@ public class MypageController {
         return mypageService.myPost();
     }
 
+    @PostMapping("/score/{targetId}")
+    public void SendScore(@PathVariable Integer targetId, @RequestBody SendScoreRequest sendScoreRequest) {
+       mypageService.SendScore(targetId, sendScoreRequest);
+    }
 
+    @PutMapping()
+    public void UpdateMyPage(@RequestParam String intro,
+                             @RequestParam MultipartFile image) {
+        mypageService.updateMyPage(
+                MyPageUpdateRequest.builder()
+                        .intro(intro)
+                        .imagePath(image)
+                        .build()
+        );
+    }
 
 }
 
