@@ -192,7 +192,10 @@ public class AdminServiceImpl implements AdminService{
         Customer customer = customerRepository.findById(userId)
                 .orElseThrow(UserNotFound::new);
 
-        Score score = scoreRepository.findByUserId(userId)
+        List<UserReports> userReports = userReportRepository.findByTargetId(userId);
+        if (userReports.size() == 0) throw new UserNotFound();
+
+        scoreRepository.findByUserId(userId)
                 .orElseThrow(UserNotFound::new);
 
         List<UserReports> reportList = userReportRepository.findByTargetId(userId);
