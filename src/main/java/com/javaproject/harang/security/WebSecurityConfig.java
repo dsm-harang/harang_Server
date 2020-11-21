@@ -37,7 +37,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .antMatchers("/auth").permitAll()
                 .antMatchers("/user/**").permitAll()
                 .antMatchers("/post/**").permitAll()
-                .antMatchers("/admin/**").hasRole("ADMIN")
                 .and()
                 .apply(new JwtConfigurer(jwtProvider)).and();
     }
