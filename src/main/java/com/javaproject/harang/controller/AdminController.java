@@ -55,4 +55,5 @@ public class AdminController {
     public UserPageResponse userPage(@PathVariable Integer userId){
         return adminService.userPage(userId);
     }
+
 }
