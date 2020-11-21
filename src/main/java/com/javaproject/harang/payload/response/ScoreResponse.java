@@ -1,15 +1,15 @@
 package com.javaproject.harang.payload.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Builder
 public class ScoreResponse {
+    private Integer userId;
+    private Integer senderId;
     private String senderName;
     private String comment;
     private double score;
