@@ -13,17 +13,16 @@ import com.javaproject.harang.entity.user.admin.Admin;
 import com.javaproject.harang.entity.user.admin.AdminRepository;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
-import com.javaproject.harang.exception.AdminNotFound;
-import com.javaproject.harang.exception.PostNotFound;
-import com.javaproject.harang.exception.TargetNotFound;
-import com.javaproject.harang.exception.UserNotFound;
+import com.javaproject.harang.exception.*;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.payload.response.PostReportResponse;
 import com.javaproject.harang.payload.response.UserPageResponse;
 import com.javaproject.harang.payload.response.UserReportResponse;
+import com.javaproject.harang.security.AuthorityType;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.jni.Local;
+import org.hibernate.usertype.UserType;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -49,8 +48,10 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public void userDelete(Integer targetId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        adminRepository.findById(receiptCode)
+        Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
+
+        if (admin.getType().equals(AuthorityType.USER)) throw new PermissionDeniedException();
 
         Customer user = customerRepository.findById(targetId)
                 .orElseThrow(UserNotFound::new);
@@ -72,8 +73,10 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public void userPostDelete(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        adminRepository.findById(receiptCode)
+        Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
+
+        if (admin.getType().equals(AuthorityType.USER)) throw new PermissionDeniedException();
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);
@@ -92,8 +95,10 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public void userReportDelete(Integer targetId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        adminRepository.findById(receiptCode)
+        Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
+
+        if (admin.getType().equals(AuthorityType.USER)) throw new PermissionDeniedException();
 
         List<UserReports> userReports = userReportRepository.findByTargetId(targetId);
         if (userReports.size() < 0) throw new TargetNotFound();
@@ -107,8 +112,10 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public void postReportDelete(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        adminRepository.findById(receiptCode)
+        Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
+
+        if (admin.getType().equals(AuthorityType.USER)) throw new PermissionDeniedException();
 
         Report report = reportRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);
@@ -120,8 +127,10 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public void score(Integer targetId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        adminRepository.findById(receiptCode)
+        Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
+
+        if (admin.getType().equals(AuthorityType.USER)) throw new PermissionDeniedException();
 
         List<Score> scoreList = scoreRepository.findByScoreTargetId(targetId);
 
@@ -134,8 +143,10 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public List<PostReportResponse> postReport() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        adminRepository.findById(receiptCode)
+        Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
+
+        if (admin.getType().equals(AuthorityType.USER)) throw new PermissionDeniedException();
 
         List<PostReportResponse> list = new ArrayList<>();
         for (Report report : reportRepository.findAll()) {
@@ -163,8 +174,10 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public List<UserReportResponse> userReport() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        adminRepository.findById(receiptCode)
+        Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
+
+        if (admin.getType().equals(AuthorityType.USER)) throw new PermissionDeniedException();
 
         List<UserReportResponse> list = new ArrayList<>();
         for(UserReports reports : userReportRepository.findAll()){
@@ -187,8 +200,10 @@ public class AdminServiceImpl implements AdminService{
     @Override
     public UserPageResponse userPage(Integer userId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        adminRepository.findById(receiptCode)
+        Admin admin = adminRepository.findById(receiptCode)
                 .orElseThrow(AdminNotFound::new);
+
+        if (admin.getType().equals(AuthorityType.USER)) throw new PermissionDeniedException();
 
         Customer customer = customerRepository.findById(userId)
                 .orElseThrow(UserNotFound::new);
