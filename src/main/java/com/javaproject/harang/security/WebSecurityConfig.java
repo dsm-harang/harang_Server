@@ -1,6 +1,7 @@
 package com.javaproject.harang.security;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.usertype.UserType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -36,6 +37,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .antMatchers("/auth").permitAll()
                 .antMatchers("/user/**").permitAll()
                 .antMatchers("/post/**").permitAll()
+                .antMatchers("/admin/**").hasAnyAuthority("ADMIN")
                 .and()
                 .apply(new JwtConfigurer(jwtProvider)).and();
     }
