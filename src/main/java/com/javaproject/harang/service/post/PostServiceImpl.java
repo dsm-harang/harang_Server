@@ -206,7 +206,7 @@ public class PostServiceImpl implements PostService {
                     .orElseThrow(UserNotFound::new);
 
             File file = new File(customer.getImagePath());
-            File fileName = new File(post.getImage());
+            File fileName = new File(post.getImage());  
 
             if(post.getMeetTime().isBefore(LocalDateTime.now())){
                 notifyService.addScoreNotice(post.getId());
@@ -229,6 +229,7 @@ public class PostServiceImpl implements PostService {
                             .profileImage(file.getName())
                             .build()
             );
+            list.forEach(System.out::println);
         }
         return list;
     }
