@@ -13,8 +13,8 @@ public interface MypageService {
     Map<String, Object> SeeMyPage();
     Map<String, Object> SeeOtherPage(Integer Id);
     void updateMyPage(MyPageUpdateRequest myPageUpdateRequest);
-    List<ScoreResponse> getScore(Integer id);
-    List<ScoreResponse> getScore();
+    List<ScoreResponse> getTargetScore(Integer targetId);
+    List<ScoreResponse> getMyScore();
     void SendScore(Integer targetId, SendScoreRequest sendScoreRequest);
     ListScoreResponse ListScore(Integer postId);
     List<MyPostListResponse> myPost();
