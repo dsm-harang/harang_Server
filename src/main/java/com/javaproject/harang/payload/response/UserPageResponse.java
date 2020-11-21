@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 public class UserPageResponse {
     private String name;
-    private Integer score;
+    private double score;
     private String imageName;
     private List<String> content;
 }
