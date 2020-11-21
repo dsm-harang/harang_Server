@@ -201,7 +201,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(UserNotFound::new);
 
         List<PostListResponse> list = new ArrayList<>();
-        for (Post post : postRepository.findAllByUserNot(user)) {
+        for (Post post : postRepository.findAll()) {
             Customer customer = customerRepository.findById(post.getUserId())
                     .orElseThrow(UserNotFound::new);
 
