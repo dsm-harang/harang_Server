@@ -234,6 +234,7 @@ public class PostServiceImpl implements PostService {
                             .personnel(post.getPersonnel())
                             .postImage(fileName.getName())
                             .tag(post.getTag())
+                            .isMine(isMine)
                             .profileImage(file.getName())
                             .build()
             );

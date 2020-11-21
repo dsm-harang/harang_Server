@@ -21,6 +21,7 @@ public class PostListResponse {
     private Integer personnel;
     private String postImage;
     private String tag;
+    private boolean isMine;
     private double score;
     private String profileImage;
 }
