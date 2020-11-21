@@ -181,7 +181,7 @@ public class AdminServiceImpl implements AdminService{
 
         List<UserReportResponse> list = new ArrayList<>();
         for(UserReports reports : userReportRepository.findAll()){
-            customerRepository.findById(reports.getTargetId())
+           Customer customer = customerRepository.findById(reports.getTargetId())
                     .orElseThrow(TargetNotFound::new);
 
             list.add(
@@ -190,7 +190,7 @@ public class AdminServiceImpl implements AdminService{
                         .targetId(reports.getTargetId())
                         .targetName(reports.getTargetName())
                         .reportTime(LocalDate.now())
-                        .targetUserId(reports.getTargetUserId())
+                        .targetUserId(customer.getUserId())
                         .build()
             );
         }
