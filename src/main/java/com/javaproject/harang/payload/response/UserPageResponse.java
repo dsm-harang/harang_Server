@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @Builder
 public class UserPageResponse {
+    private String userId;
     private String name;
     private double score;
     private String imageName;

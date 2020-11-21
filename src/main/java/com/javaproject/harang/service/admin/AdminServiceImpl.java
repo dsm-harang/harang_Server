@@ -209,6 +209,7 @@ public class AdminServiceImpl implements AdminService{
                     .name(customer.getName())
                     .imageName(fileName.getName())
                     .content(contents)
+                    .userId(customer.getUserId())
                     .build();
     }
 
