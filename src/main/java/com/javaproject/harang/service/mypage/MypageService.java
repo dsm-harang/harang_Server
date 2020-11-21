@@ -3,7 +3,7 @@ package com.javaproject.harang.service.mypage;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
-import com.javaproject.harang.payload.response.MyPostListResponse;
+import com.javaproject.harang.payload.response.AllPostListResponse;
 import com.javaproject.harang.payload.response.ScoreResponse;
 
 import java.util.List;
@@ -17,5 +17,6 @@ public interface MypageService {
     List<ScoreResponse> getMyScore();
     void SendScore(Integer targetId, SendScoreRequest sendScoreRequest);
     ListScoreResponse ListScore(Integer postId);
-    List<MyPostListResponse> myPost();
+    List<AllPostListResponse> myPost();
+    List<AllPostListResponse> targetPost(Integer targetId);
 }

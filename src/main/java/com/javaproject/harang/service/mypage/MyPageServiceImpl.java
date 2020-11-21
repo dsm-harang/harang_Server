@@ -9,11 +9,12 @@ import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.TargetNotFound;
 import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
-import com.javaproject.harang.payload.response.MyPostListResponse;
+import com.javaproject.harang.payload.response.AllPostListResponse;
 import com.javaproject.harang.payload.response.ScoreResponse;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
@@ -185,17 +186,17 @@ public class MyPageServiceImpl implements MypageService {
     
 
     @Override
-    public List<MyPostListResponse> myPost() {
+    public List<AllPostListResponse> myPost() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
         List<Post> postList = postRepository.findAllByUser(user);
 
-        List<MyPostListResponse> myPostList = new ArrayList<>();
+        List<AllPostListResponse> myPostList = new ArrayList<>();
         for (Post post : postList) {
             myPostList.add(
-                    MyPostListResponse.builder()
+                    AllPostListResponse.builder()
                             .postId(post.getId())
                             .postTitle(post.getTitle())
                             .build()
@@ -203,6 +204,30 @@ public class MyPageServiceImpl implements MypageService {
         }
 
         return myPostList;
+    }
+
+    @Override
+    public List<AllPostListResponse> targetPost(Integer targetId) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        customerRepository.findById(receiptCode)
+                .orElseThrow(UserNotFound::new);
+
+        Customer target = customerRepository.findById(targetId)
+                .orElseThrow(TargetNotFound::new);
+
+        List<Post> postList = postRepository.findAllByUser(target);
+
+        List<AllPostListResponse> targetPostList = new ArrayList<>();
+        for (Post post : postList) {
+            targetPostList.add(
+                    AllPostListResponse.builder()
+                            .postId(post.getId())
+                            .postTitle(post.getTitle())
+                            .build()
+            );
+        }
+
+        return targetPostList;
     }
 
     private <T> void setIfNotNull(Consumer<T> setter, T value) {
