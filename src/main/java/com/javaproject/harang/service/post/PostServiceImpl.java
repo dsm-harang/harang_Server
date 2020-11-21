@@ -212,6 +212,13 @@ public class PostServiceImpl implements PostService {
                 notifyService.addScoreNotice(post.getId());
             }
 
+            boolean isMine;
+            if (post.getUserId().equals(customer.getId())) {
+                isMine = true;
+            } else  {
+                isMine = false;
+            }
+
             list.add(
                     PostListResponse.builder()
                             .postId(post.getId())
@@ -226,6 +233,7 @@ public class PostServiceImpl implements PostService {
                             .createdAt(post.getCreatedAt())
                             .personnel(post.getPersonnel())
                             .postImage(fileName.getName())
+                            .tag(post.getTag())
                             .profileImage(file.getName())
                             .build()
             );
