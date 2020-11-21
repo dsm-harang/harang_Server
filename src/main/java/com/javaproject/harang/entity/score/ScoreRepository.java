@@ -12,9 +12,10 @@ import java.util.Optional;
 public interface ScoreRepository extends CrudRepository<Score, Integer> {
 
     List<Score> findAllByScoreTargetId(Integer targetId);
-    Integer countAllByScoreTargetId(Integer targetId);
 
     Optional<Score> findByUserId(Integer userId);
+
+    void deleteByScoreTargetId(Integer targetId);
 
     @Query("SELECT c FROM Score c WHERE c.scoreTargetId=:scoreTargetId")
     List<Score> findByScoreTargetId(Integer scoreTargetId);
