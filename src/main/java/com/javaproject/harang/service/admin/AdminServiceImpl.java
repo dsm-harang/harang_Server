@@ -177,6 +177,7 @@ public class AdminServiceImpl implements AdminService{
                         .targetId(reports.getTargetId())
                         .targetName(reports.getTargetName())
                         .reportTime(LocalDate.now())
+                        .targetUserId(reports.getTargetUserId())
                         .build()
             );
         }
