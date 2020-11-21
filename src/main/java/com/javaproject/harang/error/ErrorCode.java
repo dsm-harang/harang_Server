@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ErrorCode {
 
     INVALID_TOKEN(401,"Invalid Token"),
+    PERMISSION_DENIED_EXCEPTION(401,"Permission Denied"),
     USER_NOT_FOUND(404, "User Not Found"),
     ADMIN_NOT_FOUND(404, "Admin Not Found"),
     TARGET_NOT_FOUND(404, "Target Not Found"),
