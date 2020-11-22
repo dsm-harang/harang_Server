@@ -11,6 +11,7 @@ import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.exception.PostNotFound;
 import com.javaproject.harang.exception.TargetNotFound;
+import com.javaproject.harang.exception.UserAlreadyException;
 import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.request.SendScoreRequest;
@@ -61,12 +62,14 @@ public class MyPageServiceImpl implements MypageService {
     }
 
     @Override
-    public PageInfoResponse getOtherPage(Integer Id) {
+    public PageInfoResponse getOtherPage(Integer id) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-        Customer customer = customerRepository.findById(Id)
+        if (user.getId().equals(id)) throw new UserAlreadyException();
+        
+        Customer customer = customerRepository.findById(id)
                 .orElseThrow(UserNotFound::new);
 
         File file = new File(customer.getImagePath());

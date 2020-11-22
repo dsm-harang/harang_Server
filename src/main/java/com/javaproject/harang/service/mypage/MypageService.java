@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface MypageService {
     PageInfoResponse getMyPage();
-    PageInfoResponse getOtherPage(Integer Id);
+    PageInfoResponse getOtherPage(Integer id);
     void updateMyPage(MyPageUpdateRequest myPageUpdateRequest);
     List<ScoreResponse> getTargetScore(Integer targetId);
     List<ScoreResponse> getMyScore();

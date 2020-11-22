@@ -22,8 +22,8 @@ public class MypageController {
     private final MypageService mypageService;
 
     @GetMapping("/{id}")
-    public PageInfoResponse getOtherPage(@PathVariable Integer Id) {
-        return mypageService.getOtherPage(Id);
+    public PageInfoResponse getOtherPage(@PathVariable Integer id) {
+        return mypageService.getOtherPage(id);
     }
 
     @GetMapping()
