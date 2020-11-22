@@ -169,7 +169,7 @@ public class AdminServiceImpl implements AdminService{
         for(UserReports reports : userReportRepository.findAll()){
            Customer customer = customerRepository.findById(reports.getTargetId())
                     .orElseThrow(TargetNotFound::new);
-            
+
             list.add(
                     UserReportResponse.builder()
                         .id(reports.getId())
