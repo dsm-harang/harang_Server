@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -75,12 +76,26 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public NotifyResponse MyNotify() {
+    public List<NotifyResponse> myNotify() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
-        List<Notify> notify = notifyRepository.findAllByUserId(user.getId());
 
-        return new NotifyResponse(notify);
+        List<Notify> notifyList = notifyRepository.findAllByUserId(user.getId());
+
+        List<NotifyResponse> notifyResponses = new ArrayList<>();
+        for (Notify notify : notifyList) {
+            notifyResponses.add(
+                    NotifyResponse.builder()
+                        .notifyId(notify.getId())
+                        .userUuid(user.getId())
+                        .postId(notify.getPostId())
+                        .content(notify.getContent())
+                        .creatdAt(notify.getCreatedAt())
+                        .build()
+            );
+        }
+
+        return notifyResponses;
     }
 }

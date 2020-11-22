@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/notice")
 @RequiredArgsConstructor
@@ -14,8 +16,8 @@ public class NoticeController {
     private final NotifyService notifyService;
 
     @GetMapping()
-    public NotifyResponse MyNotify() {
-        return notifyService.MyNotify();
+    public List<NotifyResponse> myNotify() {
+        return notifyService.myNotify();
     }
 
 }

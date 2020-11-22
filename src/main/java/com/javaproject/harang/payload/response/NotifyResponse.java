@@ -6,13 +6,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Setter
 @Getter
 @Builder
-@AllArgsConstructor
 public class NotifyResponse {
-    List<Notify> notify;
+    private Integer notifyId;
+    private Integer userUuid;
+    private String content;
+    private Integer postId;
+    private LocalDateTime creatdAt;
 }
 

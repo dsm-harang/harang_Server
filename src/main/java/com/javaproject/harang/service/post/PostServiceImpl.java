@@ -293,7 +293,7 @@ public class PostServiceImpl implements PostService {
                     throw new MemberAlreadyIncludeException();
                 });
 
-        notifyService.addPostNotice(postId,user.getId());
+        notifyService.addPostNotice(postId, user.getId());
 
         applicationRepository.save(
                 Application.builder()
