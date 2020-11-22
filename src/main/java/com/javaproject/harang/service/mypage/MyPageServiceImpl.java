@@ -16,6 +16,7 @@ import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
 import com.javaproject.harang.payload.response.AllPostListResponse;
+import com.javaproject.harang.payload.response.PageInfoResponse;
 import com.javaproject.harang.payload.response.ScoreResponse;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
@@ -45,35 +46,36 @@ public class MyPageServiceImpl implements MypageService {
     private String imagePath;
 
     @Override
-    public Map<String, Object> SeeMyPage() {
+    public PageInfoResponse getMyPage() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("user_id",user.getId());
-        map.put("Intro", user.getIntro());
-        map.put("name", user.getName());
-        map.put("imagePath", user.getImagePath());
-
-        return map;
+        File file = new File(user.getImagePath());
+        return PageInfoResponse.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .intro(user.getIntro())
+                    .imagName(file.getName())
+                    .build();
     }
 
     @Override
-    public Map<String, Object> SeeOtherPage(Integer Id) {
-        Map<String, Object> map = new HashMap<>();
+    public PageInfoResponse getOtherPage(Integer Id) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        User user = customerRepository.findById(receiptCode)
+                .orElseThrow(UserNotFound::new);
 
         Customer customer = customerRepository.findById(Id)
                 .orElseThrow(UserNotFound::new);
 
-        map.put("Intro", customer.getIntro());
-        map.put("user_id",customer.getId());
-        map.put("name", customer.getName());
-        map.put("imagePath", customer.getImagePath());
-
-        return map;
+        File file = new File(customer.getImagePath());
+        return PageInfoResponse.builder()
+                    .id(customer.getId())
+                    .name(customer.getName())
+                    .intro(customer.getIntro())
+                    .imagName(file.getName())
+                    .build();
     }
 
     @SneakyThrows
@@ -179,7 +181,7 @@ public class MyPageServiceImpl implements MypageService {
 
         postRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);
-        
+
         List<Member> memberScoreList =  memberRepository.findALLByPostId(postId);
 
         List<ListScoreResponse> scoreResponseList = new ArrayList<>();
