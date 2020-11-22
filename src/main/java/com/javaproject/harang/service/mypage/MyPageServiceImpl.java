@@ -68,7 +68,7 @@ public class MyPageServiceImpl implements MypageService {
                 .orElseThrow(UserNotFound::new);
 
         if (user.getId().equals(id)) throw new UserAlreadyException();
-        
+
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(UserNotFound::new);
 
@@ -95,7 +95,7 @@ public class MyPageServiceImpl implements MypageService {
             File file = new File(imagePath, user.getImagePath());
             if (file.exists()) file.delete();
 
-            customerRepository.save(user.updateFileName(imagePath + fileName));
+            customerRepository.save(user.updateFileName(imagePath + "/" +fileName));
 
             myPageUpdateRequest.getImagePath().transferTo(new File(imagePath, fileName));
         }
