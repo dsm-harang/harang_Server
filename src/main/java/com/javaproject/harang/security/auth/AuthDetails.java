@@ -5,10 +5,12 @@ import com.javaproject.harang.security.AuthorityType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -19,7 +21,11 @@ public class AuthDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new ArrayList<>();
+        List<GrantedAuthority> list = new ArrayList<>();
+        list.add(new SimpleGrantedAuthority("USER"));
+        if (user.getType().equals(AuthorityType.ADMIN))
+            list.add(new SimpleGrantedAuthority("ADMIN"));
+        return list;
     }
 
     @Override
