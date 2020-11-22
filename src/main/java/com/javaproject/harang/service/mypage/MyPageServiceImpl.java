@@ -9,6 +9,7 @@ import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.PostNotFound;
 import com.javaproject.harang.exception.TargetNotFound;
 import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
@@ -176,6 +177,9 @@ public class MyPageServiceImpl implements MypageService {
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
+        postRepository.findById(postId)
+                .orElseThrow(PostNotFound::new);
+        
         List<Member> memberScoreList =  memberRepository.findALLByPostId(postId);
 
         List<ListScoreResponse> scoreResponseList = new ArrayList<>();
