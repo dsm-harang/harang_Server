@@ -23,7 +23,7 @@ public class AuthDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> list = new ArrayList<>();
         list.add(new SimpleGrantedAuthority("USER"));
-        if (user.getType().equals(AuthorityType.ADMIN))
+        if (authorityType.equals(AuthorityType.ADMIN))
             list.add(new SimpleGrantedAuthority("ADMIN"));
         return list;
     }
