@@ -1,15 +1,14 @@
 package com.javaproject.harang.payload.response;
 
-import com.javaproject.harang.entity.member.Member;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
 
 @Getter
-@Setter
-@AllArgsConstructor
+@Builder
 public class ListScoreResponse {
-    List<Member> ListScore;
+    private Integer id;
+    private Integer postId;
+    private Integer userUuid;
+    private String userName;
+    private String imageName;
 }
