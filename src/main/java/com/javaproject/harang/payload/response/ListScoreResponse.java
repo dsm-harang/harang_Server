@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ListScoreResponse {
-    private Integer id;
     private Integer postId;
     private Integer userUuid;
     private String userName;
