@@ -14,10 +14,7 @@ public interface MemberRepository extends JpaRepository<Member, Integer>, Member
 
     Integer countAllByPostId(Integer postId);
 
-    Optional<Member> findByPostId(Integer postId);
-
-    @Query("SELECT c FROM Member c WHERE c.userId=:userId")
-    List<Member> findByAllUserId(Integer userId);
+    List<Member> findAllByPostId(Integer postId);
 
 }
 

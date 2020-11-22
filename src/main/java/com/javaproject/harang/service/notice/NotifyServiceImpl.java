@@ -65,13 +65,29 @@ public class NotifyServiceImpl implements NotifyService {
 
     }
 
-    public void addPostNotice(Integer postId, Integer userId) {
+    public void deadLineNotice(Integer postId, Integer userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFound::new);
+
         notifyRepository.save(Notify.builder()
                 .createdAt(LocalDateTime.now())
                 .userId(userId)
                 .postId(postId)
                 .type(NotifyType.Post)
-                .content(postId + "게시물에 신청이 왔습니다.")
+                .content(post.getTitle() + " " + "게시물이 마감되었습니다")
+                .build());
+    }
+
+    public void addPostNotice(Integer postId, Integer userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFound::new);
+
+        notifyRepository.save(Notify.builder()
+                .createdAt(LocalDateTime.now())
+                .userId(userId)
+                .postId(postId)
+                .type(NotifyType.Post)
+                .content(post.getTitle() + " " + "게시물에 신청이 왔습니다.")
                 .build());
     }
 

@@ -32,6 +32,7 @@ import javax.transaction.Transactional;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -51,7 +52,6 @@ public class PostServiceImpl implements PostService {
     private final ApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
-    private final ScoreRepository scoreRepository;
 
     private final NotifyServiceImpl notifyService;
 
@@ -98,6 +98,17 @@ public class PostServiceImpl implements PostService {
 
         File file = new File(imagePath, fileName);
         postWriteRequest.getImage().transferTo(file);
+
+
+        new Thread(() -> {
+            long time = post.getMeetTime().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli() - System.currentTimeMillis();
+            try {
+                Thread.sleep(time * 1000);
+                memberRepository.findAllByPostId(post.getId()).forEach(member -> {
+                    notifyService.deadLineNotice(post.getId(), member.getUserId());
+                });
+            } catch (Exception ignore) {}
+        }).start();
     }
 
     @SneakyThrows
