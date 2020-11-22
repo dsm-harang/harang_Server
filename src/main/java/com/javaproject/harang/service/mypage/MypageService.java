@@ -16,7 +16,7 @@ public interface MypageService {
     List<ScoreResponse> getTargetScore(Integer targetId);
     List<ScoreResponse> getMyScore();
     void SendScore(Integer targetId, SendScoreRequest sendScoreRequest);
-    ListScoreResponse ListScore(Integer postId);
+    List<ListScoreResponse> listScore(Integer postId);
     List<AllPostListResponse> myPost();
     List<AllPostListResponse> targetPost(Integer targetId);
 }

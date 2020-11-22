@@ -171,17 +171,27 @@ public class MyPageServiceImpl implements MypageService {
     }
 
     @Override
-    public ListScoreResponse ListScore(Integer postId) {
+    public List<ListScoreResponse> listScore(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-        List<Member> members = memberRepository.findALLByPostId(postId);
-        List<Member> collect = members.stream()
-                .filter(m -> !m.getUserId().equals(user.getId()))
-                .collect(Collectors.toList());
+        List<Member> memberScoreList =  memberRepository.findALLByPostId(postId);
 
-        return new ListScoreResponse(collect);
+        List<ListScoreResponse> scoreResponseList = new ArrayList<>();
+        for (Member member : memberScoreList) {
+            File file = new File(member.getImagePath());
+            scoreResponseList.add(
+                    ListScoreResponse.builder()
+                        .postId(member.getPostId())
+                        .userUuid(member.getUserId())
+                        .userName(member.getUserName())
+                        .imageName(file.getName())
+                        .build()
+            );
+        }
+
+        return scoreResponseList;
     }
     
 
