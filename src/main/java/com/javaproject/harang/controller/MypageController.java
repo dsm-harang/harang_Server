@@ -4,6 +4,7 @@ import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
 import com.javaproject.harang.payload.response.AllPostListResponse;
+import com.javaproject.harang.payload.response.PageInfoResponse;
 import com.javaproject.harang.payload.response.ScoreResponse;
 import com.javaproject.harang.service.mypage.MypageService;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,14 @@ public class MypageController {
 
     private final MypageService mypageService;
 
-    @GetMapping("/{Id}")
-    public Map<String, Object> SeeOtherPage(@PathVariable("Id") Integer Id) {
-        return mypageService.SeeOtherPage(Id);
+    @GetMapping("/{id}")
+    public PageInfoResponse getOtherPage(@PathVariable Integer Id) {
+        return mypageService.getOtherPage(Id);
     }
 
     @GetMapping()
-    public Map<String, Object> SeeMyPage() {
-        return mypageService.SeeMyPage();
+    public PageInfoResponse getMyPage() {
+        return mypageService.getMyPage();
     }
 
 
