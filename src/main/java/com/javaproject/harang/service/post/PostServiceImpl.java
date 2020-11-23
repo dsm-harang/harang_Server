@@ -22,6 +22,7 @@ import com.javaproject.harang.payload.response.GetPostResponse;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import com.javaproject.harang.service.notice.NotifyServiceImpl;
+import com.javaproject.harang.service.room.MessageRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +55,7 @@ public class PostServiceImpl implements PostService {
     private final ReportRepository reportRepository;
 
     private final NotifyServiceImpl notifyService;
+    private final MessageRoomService messageRoomService;
 
     private final AuthenticationFacade authenticationFacade;
 
@@ -99,6 +101,7 @@ public class PostServiceImpl implements PostService {
         File file = new File(imagePath, fileName);
         postWriteRequest.getImage().transferTo(file);
 
+        messageRoomService.createMessageRoom(user.getId(), post.getId());
 
         new Thread(() -> {
             long time = post.getMeetTime().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli() - System.currentTimeMillis();
@@ -270,6 +273,8 @@ public class PostServiceImpl implements PostService {
         User username = customerRepository.findById(application.getUserId()).orElseThrow();
 
         application.accept();
+        messageRoomService.addMessageRoom(user.getId(), posts.getId());
+
         memberRepository.save(
                 Member.builder()
                         .postId(posts.getId())
