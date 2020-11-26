@@ -224,6 +224,7 @@ public class PostServiceImpl implements PostService {
 
             if(post.getMeetTime().isBefore(LocalDateTime.now())){
                 notifyService.addScoreNotice(post.getId());
+                messageRoomService.closeRoom(post.getId());
             }
 
             boolean isMine;

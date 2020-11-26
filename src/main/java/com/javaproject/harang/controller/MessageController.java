@@ -15,7 +15,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping("/{roomId}")
-    public List<MessageResponse> getMessageList(@PathVariable String roomId,
+    public List<MessageResponse> getMessageList(@PathVariable Integer roomId,
                                                 @RequestParam Integer postId) {
         return messageService.getMessageList(roomId, postId);
     }

@@ -29,7 +29,7 @@ public class MessageServiceImpl implements MessageService{
     private final AuthenticationFacade authenticationFacade;
 
     @Override
-    public List<MessageResponse> getMessageList(String roomId, Integer postId) {
+    public List<MessageResponse> getMessageList(Integer roomId, Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);

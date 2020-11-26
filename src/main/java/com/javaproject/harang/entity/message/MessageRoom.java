@@ -1,5 +1,6 @@
 package com.javaproject.harang.entity.message;
 
+import com.javaproject.harang.entity.message.enumMessage.RoomStatus;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -18,10 +19,13 @@ public class MessageRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String roomId;
-
     private Integer postId;
 
-    private Integer userId;
+    private RoomStatus roomStatus;
 
+    public MessageRoom updateRoomStatus(RoomStatus roomStatus) {
+        this.roomStatus = roomStatus;
+
+        return this;
+    }
 }

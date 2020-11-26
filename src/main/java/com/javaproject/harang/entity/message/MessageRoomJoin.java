@@ -6,24 +6,21 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.time.LocalDateTime;
 
-@Getter
-@Builder
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Message {
-
+@Builder
+public class MessageRoomJoin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String content;
-
     private Integer roomId;
 
-    private Integer senderId;
+    private Integer postId;
 
-    private LocalDateTime localDateTime;
+    private Integer userId;
 }
