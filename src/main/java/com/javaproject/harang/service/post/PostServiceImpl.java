@@ -228,7 +228,7 @@ public class PostServiceImpl implements PostService {
             }
 
             boolean isMine;
-            if (post.getUserId().equals(customer.getId())) {
+            if (post.getUserId().equals(user.getId())) {
                 isMine = true;
             } else  {
                 isMine = false;
@@ -398,6 +398,7 @@ public class PostServiceImpl implements PostService {
                             .imageName(file.getName())
                             .build()
             );
+            System.out.println(customer.getName());
         }
         return acceptList;
     }
