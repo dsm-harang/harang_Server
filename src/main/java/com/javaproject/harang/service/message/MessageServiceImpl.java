@@ -4,6 +4,7 @@ import com.javaproject.harang.entity.Post.PostRepository;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
 import com.javaproject.harang.entity.message.Message;
+import com.javaproject.harang.entity.message.MessageRoom;
 import com.javaproject.harang.entity.message.MessageRoomJoin;
 import com.javaproject.harang.entity.message.repository.MessageRepository;
 import com.javaproject.harang.entity.message.repository.MessageRoomJoinRepository;
@@ -13,10 +14,7 @@ import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.exception.ChatRoomNotFound;
 import com.javaproject.harang.exception.UserNotFound;
-import com.javaproject.harang.payload.response.MessageListResponse;
-import com.javaproject.harang.payload.response.MessageMemberResponse;
-import com.javaproject.harang.payload.response.MessageResponse;
-import com.javaproject.harang.payload.response.MessageRoomResponse;
+import com.javaproject.harang.payload.response.*;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import com.javaproject.harang.service.room.MessageRoomService;
 import lombok.RequiredArgsConstructor;
@@ -39,29 +37,14 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRoomRepository messageRoomRepository;
 
     @Override
-    public List<MessageResponse> getMessageList(Integer roomId, Integer postId) {
+    public List<MessageResponse> getMessageList(Integer postId) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-        List<Member> memberList = memberRepository.findAllByPostId(postId);
 
-        List<MessageMemberResponse> messageMember = new ArrayList<>();
-        for (Member member : memberList) {
-            Customer customer = customerRepository.findById(member.getUserId())
-                    .orElseThrow(UserNotFound::new);
-
-            File file = new File(customer.getImagePath());
-            messageMember.add(
-                    MessageMemberResponse.builder()
-                            .score(customer.getAverageScore())
-                            .userName(customer.getName())
-                            .imageName(file.getName())
-                            .build()
-            );
-        }
-
-        List<Message> messageResponses = messageRepository.findBySenderIdAndRoomId(user.getId(), roomId);
+        MessageRoom messageRoom = messageRoomRepository.findByPostId(postId).orElseThrow();
+        List<Message> messageResponses = messageRepository.findBySenderIdAndRoomId(user.getId(), messageRoom.getId());
 
         List<MessageResponse> messageResponseList = new ArrayList<>();
         for (Message message : messageResponses) {
@@ -78,11 +61,6 @@ public class MessageServiceImpl implements MessageService {
             );
 
         }
-        messageResponseList.add(
-                MessageResponse.builder()
-                        .messageMember(messageMember)
-                        .build()
-        );
 
         return messageResponseList;
     }
@@ -113,5 +91,23 @@ public class MessageServiceImpl implements MessageService {
         return messageListResponses;
     }
 
+    @Override
+    public List<MessageScoreResponse> MessageSeeScore(Integer postId) {
+        List<Member> memberList = memberRepository.findAllByPostId(postId);
+
+        List<MessageScoreResponse> messageMember = new ArrayList<>();
+        for (Member member : memberList) {
+            Customer customer = customerRepository.findById(member.getUserId())
+                    .orElseThrow(UserNotFound::new);
+            messageMember.add(
+                    MessageScoreResponse.builder()
+                    .Score(customer.getAverageScore())
+                    .userName(customer.getName())
+                    .userId(customer.getId())
+                    .build()
+            );
+        }
+        return messageMember;
+    }
 
 }
