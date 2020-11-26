@@ -220,7 +220,7 @@ public class PostServiceImpl implements PostService {
                     .orElseThrow(UserNotFound::new);
 
             File file = new File(customer.getImagePath());
-            File fileName = new File(post.getImage());  
+            File fileName = new File(post.getImage());
 
             if(post.getMeetTime().isBefore(LocalDateTime.now())){
                 notifyService.addScoreNotice(post.getId());
@@ -309,7 +309,7 @@ public class PostServiceImpl implements PostService {
                     throw new MemberAlreadyIncludeException();
                 });
 
-        notifyService.addPostNotice(postId, user.getId());
+        notifyService.addPostNotice(postId, post.getUserId());
 
         applicationRepository.save(
                 Application.builder()

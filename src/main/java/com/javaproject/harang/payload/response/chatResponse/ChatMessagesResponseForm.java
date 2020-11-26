@@ -1,6 +1,5 @@
 package com.javaproject.harang.payload.response.chatResponse;
 
-import com.javaproject.harang.entity.chat.ChatMessage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

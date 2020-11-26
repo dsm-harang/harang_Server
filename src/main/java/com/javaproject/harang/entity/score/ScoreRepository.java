@@ -22,6 +22,7 @@ public interface ScoreRepository extends CrudRepository<Score, Integer> {
 
     Optional<Score> deleteByUserId(Integer userId);
     Optional<Score> findByUserIdAndScoreTargetId(Integer userId, Integer scoreTargetId);
+    Optional<Score> findByUserIdAndScoreTargetIdAndPostId(Integer userId, Integer scoreTargetId, Integer postId);
     List<Score> findAllByUserId(Integer userId);
 }
 

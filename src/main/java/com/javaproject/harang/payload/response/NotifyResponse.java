@@ -1,6 +1,7 @@
 package com.javaproject.harang.payload.response;
 
 import com.javaproject.harang.entity.notify.Notify;
+import com.javaproject.harang.entity.notify.NotifyType.NotifyType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,5 +18,6 @@ public class NotifyResponse {
     private String content;
     private Integer postId;
     private LocalDateTime creatdAt;
+    private NotifyType notifyType;
 }
 

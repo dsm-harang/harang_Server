@@ -32,18 +32,6 @@ public class NotifyServiceImpl implements NotifyService {
 
     private final AuthenticationFacade authenticationFacade;
 
-    public void addChatNotice(Integer postId, Integer userId) {
-        User user = customerRepository.findById(userId)
-                .orElseThrow(UserNotFound::new);
-
-        notifyRepository.save(Notify.builder()
-                .createdAt(LocalDateTime.now())
-                .userId(userId)
-                .postId(postId)
-                .type(NotifyType.Chat)
-                .content(user.getName() + "님에게 메세지를 초대가왔습니다.")
-                .build());
-    }
 
     public void addScoreNotice(Integer postId) {
         Post post = postRepository.findById(postId)
@@ -51,12 +39,12 @@ public class NotifyServiceImpl implements NotifyService {
 
         List<Member> member = memberRepository.findALLByPostId(postId);
         member.forEach(m -> {
-                    if (!notifyRepository.findByUserIdAndPostIdAndType(m.getUserId(), postId, NotifyType.Score).isPresent()) {
+                    if (!notifyRepository.findByUserIdAndPostIdAndType(m.getUserId(), postId, NotifyType.Post).isPresent()) {
                         notifyRepository.save(Notify.builder()
                                 .createdAt(LocalDateTime.now())
                                 .userId(m.getUserId())
                                 .postId(postId)
-                                .type(NotifyType.Score)
+                                .type(NotifyType.Post)
                                 .content(post.getTitle() + "의 게시물이 마감되었습니다.")
                                 .build());
                     }
@@ -81,12 +69,11 @@ public class NotifyServiceImpl implements NotifyService {
     public void addPostNotice(Integer postId, Integer userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);
-
         notifyRepository.save(Notify.builder()
                 .createdAt(LocalDateTime.now())
                 .userId(userId)
                 .postId(postId)
-                .type(NotifyType.Post)
+                .type(NotifyType.APPLY)
                 .content(post.getTitle() + " " + "게시물에 신청이 왔습니다.")
                 .build());
     }
@@ -103,12 +90,13 @@ public class NotifyServiceImpl implements NotifyService {
         for (Notify notify : notifyList) {
             notifyResponses.add(
                     NotifyResponse.builder()
-                        .notifyId(notify.getId())
-                        .userUuid(user.getId())
-                        .postId(notify.getPostId())
-                        .content(notify.getContent())
-                        .creatdAt(notify.getCreatedAt())
-                        .build()
+                            .notifyId(notify.getId())
+                            .userUuid(user.getId())
+                            .postId(notify.getPostId())
+                            .content(notify.getContent())
+                            .notifyType(notify.getType())
+                            .creatdAt(notify.getCreatedAt())
+                            .build()
             );
         }
 

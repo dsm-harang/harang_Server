@@ -9,10 +9,7 @@ import com.javaproject.harang.entity.score.ScoreRepository;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
-import com.javaproject.harang.exception.PostNotFound;
-import com.javaproject.harang.exception.TargetNotFound;
-import com.javaproject.harang.exception.UserAlreadyException;
-import com.javaproject.harang.exception.UserNotFound;
+import com.javaproject.harang.exception.*;
 import com.javaproject.harang.payload.request.MyPageUpdateRequest;
 import com.javaproject.harang.payload.request.SendScoreRequest;
 import com.javaproject.harang.payload.response.ListScoreResponse;
@@ -33,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MyPageServiceImpl implements MypageService {
+public class MyPageServiceImpl implements MyPageService {
 
     private final CustomerRepository customerRepository;
     private final ScoreRepository scoreRepository;
@@ -54,11 +51,11 @@ public class MyPageServiceImpl implements MypageService {
 
         File file = new File(user.getImagePath());
         return PageInfoResponse.builder()
-                    .id(user.getId())
-                    .name(user.getName())
-                    .intro(user.getIntro())
-                    .imagName(file.getName())
-                    .build();
+                .id(user.getId())
+                .name(user.getName())
+                .intro(user.getIntro())
+                .imagName(file.getName())
+                .build();
     }
 
     @Override
@@ -74,11 +71,11 @@ public class MyPageServiceImpl implements MypageService {
 
         File file = new File(customer.getImagePath());
         return PageInfoResponse.builder()
-                    .id(customer.getId())
-                    .name(customer.getName())
-                    .intro(customer.getIntro())
-                    .imagName(file.getName())
-                    .build();
+                .id(customer.getId())
+                .name(customer.getName())
+                .intro(customer.getIntro())
+                .imagName(file.getName())
+                .build();
     }
 
     @SneakyThrows
@@ -95,7 +92,7 @@ public class MyPageServiceImpl implements MypageService {
             File file = new File(imagePath, user.getImagePath());
             if (file.exists()) file.delete();
 
-            customerRepository.save(user.updateFileName(imagePath + "/" +fileName));
+            customerRepository.save(user.updateFileName(imagePath + "/" + fileName));
 
             myPageUpdateRequest.getImagePath().transferTo(new File(imagePath, fileName));
         }
@@ -122,13 +119,14 @@ public class MyPageServiceImpl implements MypageService {
 
             scoreResponses.add(
                     ScoreResponse.builder()
-                        .userId(targetId)
-                        .senderId(score.getUserId())
-                        .score(user.getAverageScore())
-                        .scoreAt(score.getScoreAt())
-                        .comment(score.getScoreComment())
-                        .senderName(target.getName())
-                        .build()
+                            .userId(targetId)
+                            .postId(score.getPostId())
+                            .senderId(score.getUserId())
+                            .score(user.getAverageScore())
+                            .scoreAt(score.getScoreAt())
+                            .comment(score.getScoreComment())
+                            .senderName(target.getName())
+                            .build()
             );
         }
 
@@ -138,7 +136,7 @@ public class MyPageServiceImpl implements MypageService {
     @Override
     public List<ScoreResponse> getMyScore() {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        User user =customerRepository.findById(receiptCode)
+        User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
         List<ScoreResponse> scoreResponses = new ArrayList<>();
@@ -146,6 +144,7 @@ public class MyPageServiceImpl implements MypageService {
             scoreResponses.add(
                     ScoreResponse.builder()
                             .userId(user.getId())
+                            .postId(score.getPostId())
                             .senderId(score.getUserId())
                             .score(user.getAverageScore())
                             .scoreAt(score.getScoreAt())
@@ -161,18 +160,28 @@ public class MyPageServiceImpl implements MypageService {
     @Override
     public void SendScore(Integer targetId, SendScoreRequest sendScoreRequest) {
         Integer receiptCode = authenticationFacade.getReceiptCode();
-        customerRepository.findById(receiptCode)
+        User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
         memberRepository.findByUserIdAndPostId(targetId, sendScoreRequest.getPostId())
                 .orElseThrow(UserNotFound::new);
-
-        Score.builder()
-                .score((int) sendScoreRequest.getScore())
-                .scoreAt(LocalDateTime.now())
-                .scoreComment(sendScoreRequest.getScoreContent())
-                .scoreTargetId(targetId)
-                .build();
+        try {
+            Score score = scoreRepository.findByUserIdAndScoreTargetIdAndPostId(user.getId(), targetId, sendScoreRequest.getPostId()).get();
+            scoreRepository.save(score.updateScore(sendScoreRequest.getScore(), LocalDateTime.now(), sendScoreRequest.getScoreContent()));
+        } catch (NoSuchElementException e) {
+            scoreRepository.save(
+                    Score.builder()
+                            .userId(user.getId())
+                            .postId(sendScoreRequest.getPostId())
+                            .score((int) sendScoreRequest.getScore())
+                            .scoreAt(LocalDateTime.now())
+                            .scoreComment(sendScoreRequest.getScoreContent())
+                            .scoreTargetId(targetId)
+                            .build()
+            );
+        } catch (RuntimeException e) {
+            throw new AllReadyScoreException();
+        }
 
     }
 
@@ -185,24 +194,27 @@ public class MyPageServiceImpl implements MypageService {
         postRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);
 
-        List<Member> memberScoreList =  memberRepository.findALLByPostId(postId);
+        List<Member> memberScoreList = memberRepository.findALLByPostId(postId);
 
         List<ListScoreResponse> scoreResponseList = new ArrayList<>();
         for (Member member : memberScoreList) {
             File file = new File(member.getImagePath());
             scoreResponseList.add(
                     ListScoreResponse.builder()
-                        .postId(member.getPostId())
-                        .userUuid(member.getUserId())
-                        .userName(member.getUserName())
-                        .imageName(file.getName())
-                        .build()
+                            .postId(member.getPostId())
+                            .userUuid(member.getUserId())
+                            .userName(member.getUserName())
+                            .imageName(file.getName())
+                            .build()
             );
         }
+        List<ListScoreResponse> result = scoreResponseList.stream()
+                .filter(m -> !m.getUserUuid().equals(user.getId()))
+                .collect(Collectors.toList());
 
-        return scoreResponseList;
+        return result;
     }
-    
+
 
     @Override
     public List<AllPostListResponse> myPost() {

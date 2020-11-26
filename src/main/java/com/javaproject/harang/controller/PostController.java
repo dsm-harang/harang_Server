@@ -70,7 +70,7 @@ public class PostController {
     }
 
     @PostMapping("/{postId}")
-    private void sendPost(@PathVariable Integer postId){
+        private void sendPost(@PathVariable Integer postId){
         postService.sendPost(postId);
     }
 

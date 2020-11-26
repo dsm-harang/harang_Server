@@ -10,7 +10,7 @@ import com.javaproject.harang.payload.response.ScoreResponse;
 import java.util.List;
 import java.util.Map;
 
-public interface MypageService {
+public interface MyPageService {
     PageInfoResponse getMyPage();
     PageInfoResponse getOtherPage(Integer id);
     void updateMyPage(MyPageUpdateRequest myPageUpdateRequest);
