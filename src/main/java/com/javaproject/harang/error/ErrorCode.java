@@ -26,6 +26,7 @@ public enum ErrorCode {
     APPLICATION_ALREADY_EXCEPTION(409, "Application Already Exception"),
     REPORT_ALREADY_EXCEPTION(409, "Report Already Exception"),
     USER_ALREADY_EXCEPTION(409, "User Already Exception"),
+    ALL_READY_SCORE(409,"Score Already Exception"),
     USER_ALREADY_REPORT(409, "User Already Report"),
     MEMBER_ALREADY_INCLUDE_EXCEPTION(409, "Member Already Include Exception");
 

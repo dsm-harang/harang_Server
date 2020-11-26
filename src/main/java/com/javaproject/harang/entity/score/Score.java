@@ -1,5 +1,6 @@
 package com.javaproject.harang.entity.score;
 
+import com.javaproject.harang.entity.message.MessageRoom;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,5 +28,14 @@ public class Score {
 
     private Integer scoreTargetId;
 
+    private Integer postId;
+
+    public Score updateScore(Integer score,LocalDateTime scoreAt,String scoreComment) {
+        this.score = score;
+        this.scoreAt = scoreAt;
+        this.scoreComment = scoreComment;
+
+        return this;
+    }
 
 }

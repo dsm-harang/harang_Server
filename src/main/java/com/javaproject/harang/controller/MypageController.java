@@ -6,20 +6,19 @@ import com.javaproject.harang.payload.response.ListScoreResponse;
 import com.javaproject.harang.payload.response.AllPostListResponse;
 import com.javaproject.harang.payload.response.PageInfoResponse;
 import com.javaproject.harang.payload.response.ScoreResponse;
-import com.javaproject.harang.service.mypage.MypageService;
+import com.javaproject.harang.service.mypage.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/mypage")
 @RequiredArgsConstructor
 public class MypageController {
 
-    private final MypageService mypageService;
+    private final MyPageService mypageService;
 
     @GetMapping("/{id}")
     public PageInfoResponse getOtherPage(@PathVariable Integer id) {
@@ -42,7 +41,7 @@ public class MypageController {
         return mypageService.getMyScore();
     }
 
-    @GetMapping("/scorelist/{postId}")
+    @GetMapping("/scoreList/{postId}")
     public List<ListScoreResponse> listScore(@PathVariable("postId") Integer postId) {
         return mypageService.listScore(postId);
     }

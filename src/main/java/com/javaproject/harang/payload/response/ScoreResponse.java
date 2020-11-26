@@ -12,6 +12,7 @@ public class ScoreResponse {
     private Integer senderId;
     private String senderName;
     private String comment;
+    private Integer postId;
     private double score;
     private LocalDateTime scoreAt;
 }
