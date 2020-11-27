@@ -19,4 +19,5 @@ public interface NotifyRepository extends CrudRepository<Notify, Integer> {
     
     Optional<Notify> findByUserIdAndPostIdAndType(Integer userId, Integer postId, NotifyType Type);
 
+    Optional<Notify> deleteByIdAndUserId(Integer Id,Integer userId);
 }

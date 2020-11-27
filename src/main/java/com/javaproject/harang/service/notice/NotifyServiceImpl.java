@@ -102,4 +102,13 @@ public class NotifyServiceImpl implements NotifyService {
 
         return notifyResponses;
     }
+
+    @Override
+    public void deleteNotify(Integer notifyId) {
+        Integer receiptCode = authenticationFacade.getReceiptCode();
+        User user = customerRepository.findById(receiptCode)
+                .orElseThrow(UserNotFound::new);
+
+        notifyRepository.deleteByIdAndUserId(notifyId, user.getId());
+    }
 }

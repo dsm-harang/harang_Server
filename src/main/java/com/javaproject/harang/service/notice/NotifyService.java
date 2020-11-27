@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface NotifyService {
     List<NotifyResponse> myNotify();
+    void deleteNotify(Integer notifyId);
+
 }
