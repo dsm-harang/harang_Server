@@ -393,6 +393,7 @@ public class PostServiceImpl implements PostService {
             File file = new File(customer.getImagePath());
             acceptList.add(
                     AcceptListResponse.builder()
+                            .applicationId(application.getId())
                             .userId(application.getUserId())
                             .userName(customer.getName())
                             .score(user.getAverageScore())
