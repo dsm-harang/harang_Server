@@ -12,6 +12,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "User Not Found"),
     ADMIN_NOT_FOUND(404, "Admin Not Found"),
     TARGET_NOT_FOUND(404, "Target Not Found"),
+    NOTIFY_NOT_FOUND(404,"Notify Not Found"),
     POST_NOT_FOUND(404, "Post Not Found"),
     WRITER_NOT_FOUND(404, "Writer Not Found"),
     CHATROOM_NOT_FOUND(404,"ChatRoom Not Found"),

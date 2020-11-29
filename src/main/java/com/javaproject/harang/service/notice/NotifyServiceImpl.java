@@ -9,6 +9,7 @@ import com.javaproject.harang.entity.notify.NotifyRepository;
 import com.javaproject.harang.entity.notify.NotifyType.NotifyType;
 import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
+import com.javaproject.harang.exception.NotifyNotFound;
 import com.javaproject.harang.exception.PostNotFound;
 import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.response.NotifyResponse;
@@ -108,7 +109,9 @@ public class NotifyServiceImpl implements NotifyService {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
-
-        notifyRepository.deleteByIdAndUserId(notifyId, user.getId());
+        Notify notify = notifyRepository.findByIdAndUserId(notifyId,user.getId())
+                .orElseThrow(NotifyNotFound::new);
+        notifyRepository.deleteById(notify.getId());
+        notifyRepository.delete(notify);
     }
 }
