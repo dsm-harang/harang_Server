@@ -274,7 +274,7 @@ public class PostServiceImpl implements PostService {
         User username = customerRepository.findById(application.getUserId()).orElseThrow();
 
         application.accept();
-        messageRoomService.addMessageRoom(user.getId(), posts.getId());
+        messageRoomService.addMessageRoom(application.getUserId(), posts.getId());
 
         memberRepository.save(
                 Member.builder()

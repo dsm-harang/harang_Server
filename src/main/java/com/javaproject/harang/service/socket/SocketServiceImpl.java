@@ -21,6 +21,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -117,7 +118,7 @@ public class SocketServiceImpl implements SocketService {
                         .senderId(user.getId())
                         .roomId(roomId)
                         .content(messageRequest.getMessage())
-                        .localDateTime(LocalDateTime.now())
+                        .localDateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                         .build()
         );
 
@@ -133,7 +134,7 @@ public class SocketServiceImpl implements SocketService {
     }
 
     private void printLog(SocketIOClient client, String content) {
-        String stringDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+        String stringDate = LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
 
         System.out.printf(
                 "%s  %s - [%s] - %s",
