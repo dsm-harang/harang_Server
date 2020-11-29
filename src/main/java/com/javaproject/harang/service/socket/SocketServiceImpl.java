@@ -121,9 +121,7 @@ public class SocketServiceImpl implements SocketService {
                         .build()
         );
 
-        socketIOServer.getRoomOperations(messageRequest.getRoomId()).sendEvent(
-                "send",
-                client,
+        socketIOServer.getRoomOperations(messageRequest.getRoomId()).sendEvent("receive", client,
                 MessageResponse.builder()
                         .userId(user.getId())
                         .userName(user.getName())
