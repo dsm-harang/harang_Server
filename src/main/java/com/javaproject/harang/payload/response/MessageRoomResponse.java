@@ -10,6 +10,6 @@ public class MessageRoomResponse {
     private Integer postId;
     private Integer roomId;
     private RoomStatus roomStatus;
-
+    private String roomTitle;
 }
 

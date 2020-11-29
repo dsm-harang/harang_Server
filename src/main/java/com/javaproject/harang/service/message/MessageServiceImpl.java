@@ -1,5 +1,6 @@
 package com.javaproject.harang.service.message;
 
+import com.javaproject.harang.entity.Post.Post;
 import com.javaproject.harang.entity.Post.PostRepository;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
@@ -13,6 +14,7 @@ import com.javaproject.harang.entity.user.User;
 import com.javaproject.harang.entity.user.customer.Customer;
 import com.javaproject.harang.entity.user.customer.CustomerRepository;
 import com.javaproject.harang.exception.ChatRoomNotFound;
+import com.javaproject.harang.exception.PostNotFound;
 import com.javaproject.harang.exception.UserNotFound;
 import com.javaproject.harang.payload.response.*;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
@@ -35,6 +37,7 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRoomJoinRepository messageRoomJoinRepository;
     private final AuthenticationFacade authenticationFacade;
     private final MessageRoomRepository messageRoomRepository;
+    private final PostRepository postRepository;
 
     @Override
     public List<MessageResponse> getMessageList(Integer postId) {
@@ -75,6 +78,8 @@ public class MessageServiceImpl implements MessageService {
                     MessageRoomResponse.builder()
                             .postId(messageRoomJoin.getPostId())
                             .roomId(messageRoomJoin.getRoomId())
+                            .roomTitle(postRepository.findById(messageRoomJoin.getPostId()).
+                                    orElseThrow(PostNotFound::new).getTitle())
                             .roomStatus(messageRoomRepository.findById(messageRoomJoin.getRoomId())
                                     .orElseThrow(ChatRoomNotFound::new).getRoomStatus())
                             .build()
