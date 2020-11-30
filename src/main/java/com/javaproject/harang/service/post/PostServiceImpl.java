@@ -253,7 +253,6 @@ public class PostServiceImpl implements PostService {
                             .profileImage(file.getName())
                             .build()
             );
-            list.forEach(System.out::println);
         }
         return list;
     }
@@ -378,7 +377,7 @@ public class PostServiceImpl implements PostService {
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
 
-        Post post = postRepository.findByUser(user)
+        Post post = postRepository.findByUserAndId(user, postId)
                 .orElseThrow(PostNotFound::new);
 
         if (!user.getId().equals(post.getUserId())) throw new WriterNotFound();
@@ -400,7 +399,6 @@ public class PostServiceImpl implements PostService {
                             .imageName(file.getName())
                             .build()
             );
-            System.out.println(customer.getName());
         }
         return acceptList;
     }

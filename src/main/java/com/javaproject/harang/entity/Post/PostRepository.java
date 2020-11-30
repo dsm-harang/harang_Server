@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends CrudRepository<Post, Integer> {
     List<Post> findByTagContainsOrTitleContains(String tag, String title);
-    Optional<Post> findByUser(User user);
+    Optional<Post> findByUserAndId(User user, Integer postId);
     List<Post> findAllByUser(User user);
 }
