@@ -113,7 +113,7 @@ public class SocketServiceImpl implements SocketService {
             client.disconnect();
             return;
         }
-        messageRepository.save(
+        Message message = messageRepository.save(
                 Message.builder()
                         .senderId(user.getId())
                         .roomId(roomId)
@@ -127,7 +127,7 @@ public class SocketServiceImpl implements SocketService {
                         .userId(user.getId())
                         .userName(user.getName())
                         .message(messageRequest.getMessage())
-                        .isMine(false)
+                        .isMine(user.getId().equals(message.getSenderId()))
                         .build()
         );
 
