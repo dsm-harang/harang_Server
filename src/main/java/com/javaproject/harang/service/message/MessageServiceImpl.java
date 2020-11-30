@@ -44,10 +44,9 @@ public class MessageServiceImpl implements MessageService {
         Integer receiptCode = authenticationFacade.getReceiptCode();
         User user = customerRepository.findById(receiptCode)
                 .orElseThrow(UserNotFound::new);
-
-
+        memberRepository.findByUserIdAndPostId(user.getId(),postId).orElseThrow(UserNotFound::new);
         MessageRoom messageRoom = messageRoomRepository.findByPostId(postId).orElseThrow();
-        List<Message> messageResponses = messageRepository.findBySenderIdAndRoomId(user.getId(), messageRoom.getId());
+        List<Message> messageResponses = messageRepository.findAllByRoomId(messageRoom.getId());
 
         List<MessageResponse> messageResponseList = new ArrayList<>();
         for (Message message : messageResponses) {
@@ -106,10 +105,10 @@ public class MessageServiceImpl implements MessageService {
                     .orElseThrow(UserNotFound::new);
             messageMember.add(
                     MessageScoreResponse.builder()
-                    .Score(customer.getAverageScore())
-                    .userName(customer.getName())
-                    .userId(customer.getId())
-                    .build()
+                            .Score(customer.getAverageScore())
+                            .userName(customer.getName())
+                            .userId(customer.getId())
+                            .build()
             );
         }
         return messageMember;

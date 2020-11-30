@@ -12,5 +12,6 @@ public interface MessageRepository extends CrudRepository<Message, Integer> {
     List<Message> findBySenderIdAndRoomId(Integer senderId, Integer roomId);
     boolean existsByRoomIdAndSenderId(Integer roomId, Integer senderId);
     Optional<Message> findByRoomIdAndSenderIdNot(Integer roomId, Integer senderId);
+    List<Message> findAllByRoomId(Integer roomId);
 
 }
