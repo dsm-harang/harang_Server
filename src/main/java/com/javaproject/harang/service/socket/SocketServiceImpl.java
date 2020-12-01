@@ -35,6 +35,7 @@ public class SocketServiceImpl implements SocketService {
     private final MessageRepository messageRepository;
     private final CustomerRepository customerRepository;
     private final MessageRoomRepository messageRoomRepository;
+    private final MessageRoomJoinRepository messageRoomJoinRepository;
 
     @Override
     public void connect(SocketIOClient client) {
@@ -74,16 +75,16 @@ public class SocketServiceImpl implements SocketService {
         }
         try {
             MessageRoom messageRoom = messageRoomRepository.findById(roomId).get();
+            messageRoomJoinRepository.findByUserIdAndRoomId(user.getId(),roomId);
             if (messageRoom.getRoomStatus().equals(RoomStatus.CLOSE)) {
                 clientDisconnect(client, 401, "Room Close");
                 return;
             }
-
         } catch (Exception e) {
             clientDisconnect(client, 404, "Not Found Room");
         }
 
-        client.joinRoom(user.getId() + ":" + roomId);
+        client.joinRoom(room);
         printLog(
                 client,
                 String.format("Join Room [senderId(%d) -> receiverId(%d)] Session Id: %s%n",
@@ -94,23 +95,16 @@ public class SocketServiceImpl implements SocketService {
 
     @Override
     public void chat(SocketIOClient client, MessageRequest messageRequest) {
-
-        String[] splitRoom = messageRequest.getRoomId().split(":");
-        Integer userId = Integer.parseInt(splitRoom[0]);
-        Integer roomId = Integer.parseInt(splitRoom[1]);
-        String room = userId + ":" + roomId;
+        String room = messageRequest.getRoomId();
+        Integer roomId = Integer.parseInt(room);
         if (!client.getAllRooms().contains(room)) {
             clientDisconnect(client, 401, "Invalid Connection");
             return;
         }
 
-
         User user = client.get("user");
         if (user == null) {
             clientDisconnect(client, 403, "Invalid Connection");
-            return;
-        } else if (!user.getId().equals(userId)) {
-            client.disconnect();
             return;
         }
         Message message = messageRepository.save(
@@ -124,7 +118,7 @@ public class SocketServiceImpl implements SocketService {
 
         socketIOServer.getRoomOperations(messageRequest.getRoomId()).sendEvent("receive",
                 MessageResponse.builder()
-                        .userId(user.getId())
+                        .userId(message.getSenderId())
                         .userName(user.getName())
                         .message(messageRequest.getMessage())
                         .isMine(user.getId().equals(message.getSenderId()))
