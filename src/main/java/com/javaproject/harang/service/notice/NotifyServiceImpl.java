@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class NotifyServiceImpl implements NotifyService {
         member.forEach(m -> {
                     if (!notifyRepository.findByUserIdAndPostIdAndType(m.getUserId(), postId, NotifyType.Post).isPresent()) {
                         notifyRepository.save(Notify.builder()
-                                .createdAt(LocalDateTime.now())
+                                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                                 .userId(m.getUserId())
                                 .postId(postId)
                                 .type(NotifyType.Post)
@@ -59,7 +60,7 @@ public class NotifyServiceImpl implements NotifyService {
                 .orElseThrow(PostNotFound::new);
 
         notifyRepository.save(Notify.builder()
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .userId(userId)
                 .postId(postId)
                 .type(NotifyType.Post)
@@ -71,7 +72,7 @@ public class NotifyServiceImpl implements NotifyService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);
         notifyRepository.save(Notify.builder()
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                 .userId(userId)
                 .postId(postId)
                 .type(NotifyType.APPLY)

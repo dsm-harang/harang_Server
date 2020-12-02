@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -148,7 +149,7 @@ public class AdminServiceImpl implements AdminService{
                 PostReportResponse.builder()
                         .id(report.getId())
                         .postId(report.getPostId())
-                        .reportTime(LocalDate.now())
+                        .reportTime(LocalDate.now(ZoneId.of("Asia/Seoul")))
                         .title(post.getTitle())
                         .writer(post.getWriter())
                         .score(target.getAverageScore())
@@ -175,7 +176,7 @@ public class AdminServiceImpl implements AdminService{
                         .id(reports.getId())
                         .targetId(reports.getTargetId())
                         .targetName(reports.getTargetName())
-                        .reportTime(LocalDate.now())
+                        .reportTime(LocalDate.now(ZoneId.of("Asia/Seoul")))
                         .targetUserId(reports.getTargetUserId())
                         .build()
             );

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService{
                         .targetName(target.getName())
                         .content(content)
                         .score(user.getAverageScore())
-                        .reportTime(LocalDate.now())
+                        .reportTime(LocalDate.now(ZoneId.of("Asia/Seoul")))
                         .build()
         );
     }

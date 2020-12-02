@@ -73,7 +73,7 @@ public class PostServiceImpl implements PostService {
                         .user(user)
                         .title(postWriteRequest.getTitle())
                         .content(postWriteRequest.getContent())
-                        .createdAt(LocalDateTime.now())
+                        .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                         .tag(postWriteRequest.getTag())
                         .meetTime(postWriteRequest.getMeetTime())
                         .address(postWriteRequest.getAddress())
@@ -222,7 +222,7 @@ public class PostServiceImpl implements PostService {
             File file = new File(customer.getImagePath());
             File fileName = new File(post.getImage());
 
-            if(post.getMeetTime().isBefore(LocalDateTime.now())){
+            if(post.getMeetTime().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))){
                 notifyService.addScoreNotice(post.getId());
                 messageRoomService.closeRoom(post.getId());
             }
@@ -317,7 +317,7 @@ public class PostServiceImpl implements PostService {
                         .userId(user.getId())
                         .targetId(post.getUserId())
                         .status(Status.READY)
-                        .appliedAt(LocalDateTime.now())
+                        .appliedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                         .build()
         );
     }
@@ -335,7 +335,7 @@ public class PostServiceImpl implements PostService {
                 Report.builder()
                         .userId(user.getId())
                         .postId(postId)
-                        .reportTime(LocalDate.now())
+                        .reportTime(LocalDate.now(ZoneId.of("Asia/Seoul")))
                         .build()
         );
     }
