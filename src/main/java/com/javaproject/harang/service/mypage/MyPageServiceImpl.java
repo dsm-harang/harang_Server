@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -167,14 +168,14 @@ public class MyPageServiceImpl implements MyPageService {
                 .orElseThrow(UserNotFound::new);
         try {
             Score score = scoreRepository.findByUserIdAndScoreTargetIdAndPostId(user.getId(), targetId, sendScoreRequest.getPostId()).get();
-            scoreRepository.save(score.updateScore(sendScoreRequest.getScore(), LocalDateTime.now(), sendScoreRequest.getScoreContent()));
+            scoreRepository.save(score.updateScore(sendScoreRequest.getScore(), LocalDateTime.now(ZoneId.of("Asia/Seoul")), sendScoreRequest.getScoreContent()));
         } catch (NoSuchElementException e) {
             scoreRepository.save(
                     Score.builder()
                             .userId(user.getId())
                             .postId(sendScoreRequest.getPostId())
                             .score((int) sendScoreRequest.getScore())
-                            .scoreAt(LocalDateTime.now())
+                            .scoreAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                             .scoreComment(sendScoreRequest.getScoreContent())
                             .scoreTargetId(targetId)
                             .build()
