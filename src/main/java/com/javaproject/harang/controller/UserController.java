@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Pattern;
+
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class UserController {
                        @RequestParam Integer age,
                        @RequestParam String userId,
                        @RequestParam String password,
-                       @RequestParam Integer phoneNumber,
+                       @RequestParam @Pattern(regexp = "(^[0-9]*$)") Integer phoneNumber,
                        @RequestParam String intro,
                        @RequestParam MultipartFile image) {
 
