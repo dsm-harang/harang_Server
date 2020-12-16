@@ -33,7 +33,7 @@ public class NotifyServiceImpl implements NotifyService {
     private final CustomerRepository customerRepository;
 
     private final AuthenticationFacade authenticationFacade;
-    
+
     public void deadLineNotice(Integer postId, Integer userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);

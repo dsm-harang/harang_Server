@@ -2,6 +2,8 @@ package com.javaproject.harang.service.admin;
 
 import com.javaproject.harang.entity.Post.Post;
 import com.javaproject.harang.entity.Post.PostRepository;
+import com.javaproject.harang.entity.notify.Notify;
+import com.javaproject.harang.entity.notify.NotifyRepository;
 import com.javaproject.harang.entity.report.Report;
 import com.javaproject.harang.entity.report.UserReports;
 import com.javaproject.harang.entity.report.repository.ReportRepository;
@@ -20,6 +22,7 @@ import com.javaproject.harang.payload.response.UserPageResponse;
 import com.javaproject.harang.payload.response.UserReportResponse;
 import com.javaproject.harang.security.AuthorityType;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
+import com.javaproject.harang.service.notice.NotifyServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.jni.Local;
 import org.hibernate.usertype.UserType;
@@ -42,6 +45,8 @@ public class AdminServiceImpl implements AdminService{
     private final PostRepository postRepository;
     private final CustomerRepository customerRepository;
     private final ScoreRepository scoreRepository;
+    private final NotifyServiceImpl notifyService;
+    private final NotifyRepository notifyRepository;
 
     private final AuthenticationFacade authenticationFacade;
 
@@ -80,6 +85,12 @@ public class AdminServiceImpl implements AdminService{
 
         Report report = reportRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);
+
+        //post 관련 알람 삭제입니다.
+        List<Notify> notifyList = notifyRepository.findAllByPostId(postId);
+        for (Notify notify : notifyList) {
+            notifyService.deleteNotify(notify.getId());
+        }
 
         postRepository.deleteById(post.getId());
         postRepository.delete(post);

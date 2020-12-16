@@ -7,6 +7,8 @@ import com.javaproject.harang.entity.application.ApplicationRepository;
 import com.javaproject.harang.entity.application.eunm.Status;
 import com.javaproject.harang.entity.member.Member;
 import com.javaproject.harang.entity.member.MemberRepository;
+import com.javaproject.harang.entity.notify.Notify;
+import com.javaproject.harang.entity.notify.NotifyRepository;
 import com.javaproject.harang.entity.report.Report;
 import com.javaproject.harang.entity.report.repository.ReportRepository;
 import com.javaproject.harang.entity.score.Score;
@@ -19,6 +21,7 @@ import com.javaproject.harang.payload.request.PostUpdateRequest;
 import com.javaproject.harang.payload.request.PostWriteRequest;
 import com.javaproject.harang.payload.response.AcceptListResponse;
 import com.javaproject.harang.payload.response.GetPostResponse;
+import com.javaproject.harang.payload.response.NotifyResponse;
 import com.javaproject.harang.payload.response.PostListResponse;
 import com.javaproject.harang.security.auth.AuthenticationFacade;
 import com.javaproject.harang.service.notice.NotifyServiceImpl;
@@ -52,6 +55,7 @@ public class PostServiceImpl implements PostService {
     private final ApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
+    private final NotifyRepository notifyRepository;
 
     private final NotifyServiceImpl notifyService;
     private final MessageRoomService messageRoomService;
@@ -175,6 +179,12 @@ public class PostServiceImpl implements PostService {
 
         File file = new File(imagePath, String.valueOf(fileName));
         if (file.exists()) file.delete();
+
+        //post 관련 알람 삭제입니다.
+        List<Notify> notifyList = notifyRepository.findAllByPostId(postId);
+        for (Notify notify : notifyList) {
+            notifyService.deleteNotify(notify.getId());
+        }
 
         postRepository.deleteById(post.getId());
         postRepository.delete(post);

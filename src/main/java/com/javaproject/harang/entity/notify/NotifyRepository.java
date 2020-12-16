@@ -16,7 +16,7 @@ public interface NotifyRepository extends CrudRepository<Notify, Integer> {
 
     @Query("SELECT c FROM Notify c WHERE c.userId=:userId")
     List<Notify> findAllByUserId(Integer userId);
-    
+    List<Notify> findAllByPostId(Integer postId);
     Optional<Notify> findByUserIdAndPostIdAndType(Integer userId, Integer postId, NotifyType Type);
 
     Optional<Notify> findByIdAndUserId(Integer Id,Integer userId);
