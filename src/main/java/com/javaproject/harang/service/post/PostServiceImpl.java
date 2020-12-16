@@ -102,16 +102,16 @@ public class PostServiceImpl implements PostService {
         postWriteRequest.getImage().transferTo(file);
 
         messageRoomService.createMessageRoom(user.getId(), post.getId());
-
-        new Thread(() -> {
-            long time = post.getMeetTime().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli() - System.currentTimeMillis();
-            try {
-                Thread.sleep(time * 1000);
-                memberRepository.findAllByPostId(post.getId()).forEach(member -> {
-                    notifyService.deadLineNotice(post.getId(), member.getUserId());
-                });
-            } catch (Exception ignore) {}
-        }).start();
+//
+//        new Thread(() -> {
+//            long time = post.getMeetTime().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli() - System.currentTimeMillis();
+//            try {
+//                Thread.sleep(time * 1000);
+//                memberRepository.findAllByPostId(post.getId()).forEach(member -> {
+//                    notifyService.deadLineNotice(post.getId(), member.getUserId());
+//                });
+//            } catch (Exception ignore) {}
+//        }).start();
     }
 
     @SneakyThrows

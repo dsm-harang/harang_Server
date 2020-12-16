@@ -69,15 +69,17 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     public void addPostNotice(Integer postId, Integer userId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(PostNotFound::new);
-        notifyRepository.save(Notify.builder()
-                .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
-                .userId(userId)
-                .postId(postId)
-                .type(NotifyType.APPLY)
-                .content(post.getTitle() + " " + "게시물에 신청이 왔습니다.")
-                .build());
+        if (!notifyRepository.findByUserIdAndPostIdAndType(userId, postId, NotifyType.Post).isPresent()) {
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(PostNotFound::new);
+            notifyRepository.save(Notify.builder()
+                    .createdAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                    .userId(userId)
+                    .postId(postId)
+                    .type(NotifyType.APPLY)
+                    .content(post.getTitle() + " " + "게시물에 신청이 왔습니다.")
+                    .build());
+        }
     }
 
     @Override
