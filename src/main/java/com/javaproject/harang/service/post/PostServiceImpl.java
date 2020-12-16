@@ -40,7 +40,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 
-
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
@@ -79,7 +78,7 @@ public class PostServiceImpl implements PostService {
                         .address(postWriteRequest.getAddress())
                         .ageLimit(postWriteRequest.getAgeLimit())
                         .personnel(postWriteRequest.getPersonnel())
-                        .image(imagePath+ "/" +fileName)
+                        .image(imagePath + "/" + fileName)
                         .writer(user.getName())
                         .build()
         );
@@ -102,16 +101,21 @@ public class PostServiceImpl implements PostService {
         postWriteRequest.getImage().transferTo(file);
 
         messageRoomService.createMessageRoom(user.getId(), post.getId());
-//
-//        new Thread(() -> {
-//            long time = post.getMeetTime().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli() - System.currentTimeMillis();
-//            try {
-//                Thread.sleep(time * 1000);
-//                memberRepository.findAllByPostId(post.getId()).forEach(member -> {
-//                    notifyService.deadLineNotice(post.getId(), member.getUserId());
-//                });
-//            } catch (Exception ignore) {}
-//        }).start();
+
+        new Thread(() -> {
+            long time = post.getMeetTime().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli() - System.currentTimeMillis();
+            try {
+                if (time < 0) {
+                    time = 0;
+                }
+                Thread.sleep(time * 1000);
+                memberRepository.findAllByPostId(post.getId()).forEach(member -> {
+                    notifyService.deadLineNotice(post.getId(), member.getUserId());
+                    messageRoomService.closeRoom(post.getId());
+                });
+            } catch (Exception ignore) {
+            }
+        }).start();
     }
 
     @SneakyThrows
@@ -222,15 +226,11 @@ public class PostServiceImpl implements PostService {
             File file = new File(customer.getImagePath());
             File fileName = new File(post.getImage());
 
-            if(post.getMeetTime().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))){
-                notifyService.addScoreNotice(post.getId());
-                messageRoomService.closeRoom(post.getId());
-            }
 
             boolean isMine;
             if (post.getUserId().equals(user.getId())) {
                 isMine = true;
-            } else  {
+            } else {
                 isMine = false;
             }
 
@@ -329,7 +329,9 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(UserNotFound::new);
 
         reportRepository.findByUserIdAndPostId(user.getId(), postId)
-                .ifPresent(report -> {throw new ReportAlreadyException();});
+                .ifPresent(report -> {
+                    throw new ReportAlreadyException();
+                });
 
         reportRepository.save(
                 Report.builder()
@@ -353,19 +355,19 @@ public class PostServiceImpl implements PostService {
             File proFileName = new File(target.getImagePath());
             list.add(
                     PostListResponse.builder()
-                        .title(post.getTitle())
-                        .content(post.getContent())
-                        .writer(post.getWriter())
-                        .meetTime(post.getMeetTime())
-                        .address(post.getAddress())
-                        .ageLimit(post.getAgeLimit())
-                        .createdAt(post.getCreatedAt())
-                        .personnel(post.getPersonnel())
-                        .postImage(postName.getName())
-                        .postId(post.getId())
-                        .userId(target.getId())
-                        .profileImage(proFileName.getName())
-                        .build()
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .writer(post.getWriter())
+                            .meetTime(post.getMeetTime())
+                            .address(post.getAddress())
+                            .ageLimit(post.getAgeLimit())
+                            .createdAt(post.getCreatedAt())
+                            .personnel(post.getPersonnel())
+                            .postImage(postName.getName())
+                            .postId(post.getId())
+                            .userId(target.getId())
+                            .profileImage(proFileName.getName())
+                            .build()
             );
         }
         return list;
